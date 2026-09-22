@@ -1,0 +1,4 @@
+battery_power,blue,clock_speed,dual_sim,fc,four_g,int_memory,m_dep,mobile_wt,n_cores,pc,px_height,px_width,ram,sc_h,sc_w,talk_time,three_g,touch_screen,wifi,edge_case_type
+500,0.0,0.5,0.0,0.0,0.0,2.0,0.1,80.0,1.0,0.0,0,500,3998.0,5.0,0.0,2.0,0.0,0.0,0.0,max_ram_min_everything_else
+2000,1.0,3.0,1.0,19.0,1.0,64.0,1.0,200.0,8.0,20.0,1960,1998,256.0,19.0,18.0,20.0,1.0,1.0,1.0,min_ram_max_everything_else
+2000,0.5,1.75,0.5,9.5,0.5,33.0,0.55,140.0,4.5,10.0,0,500,2127.0,12.0,9.0,11.0,0.5,0.5,0.5,high_battery_zero_resolution
