@@ -1,0 +1,24 @@
+{
+  "model": "baseline_random_forest_no_rfe",
+  "n_train": 1600,
+  "n_test": 400,
+  "n_features": 20,
+  "best_params": {
+    "clf__max_depth": 10,
+    "clf__min_samples_leaf": 2,
+    "clf__n_estimators": 200
+  },
+  "nested_cv_macro_f1_mean": 0.8661188011977309,
+  "nested_cv_macro_f1_std": 0.03033820697461455,
+  "nested_cv_macro_f1_folds": [
+    0.8651850939549725,
+    0.8691812673664712,
+    0.810286464076214,
+    0.8889396797302425,
+    0.8970015008607547
+  ],
+  "holdout_accuracy": 0.875,
+  "holdout_macro_f1": 0.8744671455820299,
+  "artifact_path": "artifacts\\baseline_rf.joblib",
+  "random_state": 42
+}

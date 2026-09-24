@@ -1,48 +1,37 @@
 # Data
 
-## ⚠️ Files here are SYNTHETIC placeholders — not the real dataset
+## Dataset Overview & Status
 
-`raw/train_PLACEHOLDER.csv` and `raw/merged_dataset_PLACEHOLDER.csv` are
-generated stand-ins matching the real dataset's exact schema (2,000 rows, 20
-specification features, `price_range` target with 4 balanced classes), since
-this environment has no outbound network access to Kaggle/GitHub raw hosts.
-Do not use these for your final reported metrics.
+The canonical Kaggle Mobile Price Classification dataset has been acquired and cleaned for the Month 1 (Viva 1) baseline:
 
-`merged_dataset_PLACEHOLDER.csv` additionally includes 43 edge-case rows
-(from `test_fixtures/`) tagged via a `source` column:
-- `synthetic_train` (2,000 rows) — the working placeholder training set
-- `boundary_edge_case` (40 rows) — each feature pinned at its real min/max
-- `out_of_distribution` (3 rows) — valid but unlikely feature combinations
+- **Raw Canonical Files**: `data/raw/train.csv` (2,000 rows, 20 spec features + `price_range`) and `data/raw/test.csv` (1,000 rows).
+- **Cleaned Processed Files**: `data/processed/train_cleaned.csv` and `data/processed/test_cleaned.csv` generated via `scripts/clean_data.py`.
+- **Merged Fixtures File**: `data/raw/merged_dataset.csv` combines the real training data with 43 edge-case and out-of-distribution test rows for robustness testing (PRD Chapters 15 and 19).
 
-Filter to `source == "synthetic_train"` before training/evaluating — the
-other rows have `price_range = null` and exist only to test robustness/edge
--case handling (PRD Chapters 15 and 19).
+## Data Cleaning Applied (Month 1)
 
-## How to get the real dataset (do this before Viva 1)
+1. **Zero-Missing Verification**: Confirmed 0 null / NaN values across all 20 features and target.
+2. **Deduplication**: Confirmed 0 duplicate rows.
+3. **Physical Zero Anomaly Imputation**:
+   - `sc_w` (Screen Width in cm): 180 rows had `sc_w = 0`. Imputed using the median screen width grouped by screen height `sc_h` (learned from train set only).
+   - `px_height` (Pixel Resolution Height): 2 rows had `px_height = 0`. Imputed using median aspect ratio (`px_height / px_width = 0.5211`).
+4. **Data Type Casting**: Enforced clean integer and float data types.
 
-**Option A — Kaggle (canonical source):**
-1. https://www.kaggle.com/datasets/iabhishekofficial/mobile-price-classification
-2. Download `train.csv`, place it at `data/raw/train.csv`.
-
-**Option B — Kaggle CLI:**
-```bash
-pip install kaggle
-kaggle datasets download -d iabhishekofficial/mobile-price-classification -p data/raw --unzip
-```
-
-**Option C — verified mirror (no Kaggle account needed):**
-https://github.com/erlanggapratamaP/mobileprices (`train.csv`) — confirmed to
-match the original (2,001 lines including header).
-
-Once you have the real file, re-run the RFECV feature-selection script against
-it (see `docs/cursor_build_prompts.md`, Month 1) rather than trusting any
-feature ranking computed on the placeholder data.
-
-## Folder structure
+## Folder Structure
 
 ```
 data/
-├── raw/               train_PLACEHOLDER.csv, merged_dataset_PLACEHOLDER.csv
-├── test_fixtures/      boundary_valid.csv, out_of_distribution.csv, invalid_payloads.json
-└── processed/          (create as needed) cleaned/scaled train-test splits
+├── raw/
+│   ├── train.csv                  Real canonical Kaggle train set (2,000 rows)
+│   ├── test.csv                   Real canonical Kaggle test set (1,000 rows)
+│   ├── merged_dataset.csv         Real train set + test fixtures (2,043 rows)
+│   ├── train_PLACEHOLDER.csv      Original synthetic fallback
+│   └── merged_dataset_PLACEHOLDER.csv
+├── processed/
+│   ├── train_cleaned.csv          Fully cleaned training set
+│   └── test_cleaned.csv           Cleaned test set (train-learned imputation)
+└── test_fixtures/
+    ├── boundary_valid.csv         40 boundary min/max spec test cases
+    ├── out_of_distribution.csv    3 out-of-distribution spec test cases
+    └── invalid_payloads.json      422 error test payloads
 ```

@@ -2,6 +2,16 @@
 __pycache__/
 *.py[codz]
 *$py.class
+_prd_extract.txt
+
+# Google Colab tracking notebooks
+*colab*
+notebooks/colab_data_cleaning.ipynb
+scripts/generate_colab_notebook.py
+
+# Node / frontend
+node_modules/
+frontend/dist/
 
 # C extensions
 *.so
