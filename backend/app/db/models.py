@@ -14,6 +14,7 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     Integer,
+    JSON,
     String,
     Text,
     func,
@@ -65,9 +66,13 @@ class Prediction(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
-    input_json: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    input_json: Mapped[dict] = mapped_column(
+        JSON().with_variant(JSONB, "postgresql"), nullable=False
+    )
     predicted_tier: Mapped[int] = mapped_column(Integer, nullable=False)
-    probabilities_json: Mapped[list] = mapped_column(JSONB, nullable=False)
+    probabilities_json: Mapped[list] = mapped_column(
+        JSON().with_variant(JSONB, "postgresql"), nullable=False
+    )
     model_version_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("model_registry.id"), nullable=False
     )
@@ -88,7 +93,9 @@ class WhatIfSimulation(Base):
     prediction_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("predictions.id"), nullable=False
     )
-    adjusted_spec_json: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    adjusted_spec_json: Mapped[dict] = mapped_column(
+        JSON().with_variant(JSONB, "postgresql"), nullable=False
+    )
     resulting_tier: Mapped[int] = mapped_column(Integer, nullable=False)
     margin_estimate: Mapped[float | None] = mapped_column(Float, nullable=True)
     created_at: Mapped[datetime] = mapped_column(

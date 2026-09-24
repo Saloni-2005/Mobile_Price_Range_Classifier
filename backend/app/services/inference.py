@@ -46,11 +46,43 @@ SOURCE_COLUMN = "source"
 TRAIN_SOURCE_VALUE = "synthetic_train"
 RANDOM_STATE = 42
 
-# Default artifact location: repo_root/artifacts/baseline_rf.joblib
+# Default and tuned artifact locations
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_ARTIFACT_PATH = _REPO_ROOT / "artifacts" / "baseline_rf.joblib"
+TUNED_ARTIFACT_PATH = _REPO_ROOT / "artifacts" / "tuned_rfecv_rf.joblib"
+
+# RFE-selected top features
+SELECTED_FEATURES: list[str] = [
+    "battery_power",
+    "mobile_wt",
+    "px_height",
+    "px_width",
+    "ram",
+]
 
 _model: Pipeline | None = None
+
+
+def get_active_artifact_path() -> Path:
+    """Return path to active model artifact from registry or disk fallback."""
+    try:
+        from app.db.models import ModelRegistry
+        from app.db.session import SessionLocal
+
+        db = SessionLocal()
+        active = (
+            db.query(ModelRegistry).filter(ModelRegistry.is_active.is_(True)).first()
+        )
+        db.close()
+        if active and active.artifact_path:
+            p = _REPO_ROOT / active.artifact_path
+            if p.exists():
+                return p
+    except Exception:
+        pass
+    if TUNED_ARTIFACT_PATH.exists():
+        return TUNED_ARTIFACT_PATH
+    return DEFAULT_ARTIFACT_PATH
 
 
 def project_root() -> Path:
