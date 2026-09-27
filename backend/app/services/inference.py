@@ -183,7 +183,7 @@ def save_model(model: Any, path: Path | None = None) -> Path:
 def load_model(path: Path | None = None, *, force_reload: bool = False) -> Pipeline:
     """Load (and cache) the trained pipeline artifact."""
     global _model
-    artifact = path or DEFAULT_ARTIFACT_PATH
+    artifact = path or get_active_artifact_path()
     if _model is not None and not force_reload and path is None:
         return _model
     if not artifact.exists():
@@ -207,3 +207,98 @@ def is_model_loadable(path: Path | None = None) -> bool:
 def clear_model_cache() -> None:
     global _model
     _model = None
+
+
+# ---------------------------------------------------------------------------
+# Registry helpers
+# ---------------------------------------------------------------------------
+
+def get_active_model_version() -> str:
+    """Return the version_tag of the active model_registry entry."""
+    try:
+        from app.db.models import ModelRegistry
+        from app.db.session import SessionLocal
+
+        db = SessionLocal()
+        active = db.query(ModelRegistry).filter(ModelRegistry.is_active.is_(True)).first()
+        db.close()
+        if active:
+            return active.version_tag
+    except Exception:
+        pass
+    return "unknown"
+
+
+# ---------------------------------------------------------------------------
+# Feature-importance helpers
+# ---------------------------------------------------------------------------
+
+def get_feature_importance() -> list[dict]:
+    """
+    Return per-feature importance + RFECV rank from the active Pipeline.
+
+    The tuned pipeline built in train_tuned.py has:
+      pipeline["preprocess"] = ColumnTransformer (selected features only)
+      pipeline["clf"]        = RandomForestClassifier
+
+    The function handles both:
+    - tuned pipeline: ColumnTransformer whose transformers list column names
+    - baseline pipeline: ColumnTransformer over all FEATURE_COLUMNS
+    """
+    import numpy as np
+
+    pipeline = load_model()
+    clf = pipeline.named_steps["clf"]
+    preprocessor = pipeline.named_steps["preprocess"]
+
+    # Determine which features the pipeline was trained on
+    # ColumnTransformer stores them as (name, transformer, columns)
+    transformer_cols: list[str] = []
+    for _, _, cols in preprocessor.transformers_:
+        if isinstance(cols, list):
+            transformer_cols.extend(cols)
+        elif hasattr(cols, "tolist"):
+            transformer_cols.extend(cols.tolist())
+
+    trained_features = transformer_cols if transformer_cols else FEATURE_COLUMNS
+
+    # RF importance array aligns with trained_features
+    importances: list[float] = clf.feature_importances_.tolist()
+
+    # Build a lookup: feature -> importance for trained features
+    trained_imp = dict(zip(trained_features, importances))
+
+    # Rank all FEATURE_COLUMNS: selected (rank=1) vs eliminated (rank > 1)
+    # Use importance as proxy for rank among eliminated features
+    result = []
+    non_selected_feats = [f for f in FEATURE_COLUMNS if f not in trained_features]
+    # Assign pseudo-ranks >= 2 to eliminated features (sorted by 0 importance)
+    pseudo_rank = 2
+    pseudo_ranks: dict[str, int] = {}
+    for feat in non_selected_feats:
+        pseudo_ranks[feat] = pseudo_rank
+        pseudo_rank += 1
+
+    for feat in FEATURE_COLUMNS:
+        if feat in trained_imp:
+            result.append(
+                {
+                    "feature": feat,
+                    "importance": round(trained_imp[feat], 6),
+                    "rank": 1,
+                    "selected": True,
+                }
+            )
+        else:
+            result.append(
+                {
+                    "feature": feat,
+                    "importance": 0.0,
+                    "rank": pseudo_ranks[feat],
+                    "selected": False,
+                }
+            )
+
+    # Sort by importance descending
+    result.sort(key=lambda x: x["importance"], reverse=True)
+    return result
