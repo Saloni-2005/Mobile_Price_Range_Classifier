@@ -8,6 +8,9 @@ _prd_extract.txt
 *colab*
 notebooks/colab_data_cleaning.ipynb
 scripts/generate_colab_notebook.py
+*Mobile_Price_Classification_Full_Pipeline*
+*Mobile_Price_Classification_full_pipeline*
+openapi.json
 
 # Node / frontend
 node_modules/
