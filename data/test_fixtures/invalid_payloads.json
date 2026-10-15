@@ -1,0 +1,78 @@
+[
+  {
+    "name": "negative_battery_power",
+    "payload": {
+      "battery_power": -500,
+      "ram": 2000,
+      "px_height": 800,
+      "px_width": 1200,
+      "mobile_wt": 150,
+      "n_cores": 4,
+      "int_memory": 32
+    }
+  },
+  {
+    "name": "ram_as_string",
+    "payload": {
+      "battery_power": 1500,
+      "ram": "a lot",
+      "px_height": 800,
+      "px_width": 1200,
+      "mobile_wt": 150,
+      "n_cores": 4,
+      "int_memory": 32
+    }
+  },
+  {
+    "name": "missing_required_field_ram",
+    "payload": {
+      "battery_power": 1500,
+      "px_height": 800,
+      "px_width": 1200,
+      "mobile_wt": 150,
+      "n_cores": 4,
+      "int_memory": 32
+    }
+  },
+  {
+    "name": "n_cores_out_of_range",
+    "payload": {
+      "battery_power": 1500,
+      "ram": 2000,
+      "px_height": 800,
+      "px_width": 1200,
+      "mobile_wt": 150,
+      "n_cores": 99,
+      "int_memory": 32
+    }
+  },
+  {
+    "name": "null_value",
+    "payload": {
+      "battery_power": null,
+      "ram": 2000,
+      "px_height": 800,
+      "px_width": 1200,
+      "mobile_wt": 150,
+      "n_cores": 4,
+      "int_memory": 32
+    }
+  },
+  {
+    "name": "empty_payload",
+    "payload": {}
+  },
+  {
+    "name": "extra_unexpected_field",
+    "payload": {
+      "battery_power": 1500,
+      "ram": 2000,
+      "px_height": 800,
+      "px_width": 1200,
+      "mobile_wt": 150,
+      "n_cores": 4,
+      "int_memory": 32,
+      "haunted_field": true
+    }
+  }
+]
