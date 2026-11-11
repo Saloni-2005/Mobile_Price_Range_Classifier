@@ -106,3 +106,4 @@ Evaluating all 40 single-feature min/max boundary rows in [`data/test_fixtures/b
 - **Zero crashes or NaN outputs** across all 40 boundary configurations.
 - **Tier distribution:** `1` Tier 0 (`ram_at_min`), `34` Tier 1 (baseline mid-spec with non-RFE or moderate boundary perturbations), `4` Tier 2 (`battery_power_at_max`, `px_height_at_max`, `px_width_at_max`), and `1` Tier 3 (`ram_at_max`).
 - **Confidence range:** Min confidence `0.50`, mean confidence `0.6155`, max confidence `0.96` (`ram_at_min = 256 MB`).
+
