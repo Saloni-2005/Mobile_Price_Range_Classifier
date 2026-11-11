@@ -14,6 +14,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import sys
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -28,7 +29,9 @@ from sklearn.model_selection import train_test_split
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "backend"))
 
+# pyrefly: ignore [missing-import]
 from app.schemas.prediction import TIER_LABELS  # noqa: E402
+# pyrefly: ignore [missing-import]
 from app.services.inference import (  # noqa: E402
     FEATURE_COLUMNS,
     RANDOM_STATE,
@@ -38,10 +41,11 @@ from app.services.inference import (  # noqa: E402
     load_model,
     load_training_frame,
 )
+# pyrefly: ignore [missing-import]
 from app.services.shap_service import explain_prediction  # noqa: E402
 
 
-def run_error_analysis() -> dict:
+def run_error_analysis() -> dict[str, Any]:
     # 1. Load dataset & reproduce exact 80/20 stratified hold-out split
     df = load_training_frame()
     X = df[FEATURE_COLUMNS]
@@ -51,17 +55,21 @@ def run_error_analysis() -> dict:
         X, y, test_size=0.2, stratify=y, random_state=RANDOM_STATE
     )
 
+    X_test_df = pd.DataFrame(X_test, columns=pd.Index(FEATURE_COLUMNS)).reset_index(
+        drop=True
+    )
     pipeline = load_model(TUNED_ARTIFACT_PATH, force_reload=True)
-    y_pred = pipeline.predict(X_test)
-    y_proba = pipeline.predict_proba(X_test)
+    y_pred = np.asarray(pipeline.predict(X_test_df), dtype=int)
+    y_proba = np.asarray(pipeline.predict_proba(X_test_df), dtype=float)
 
-    cm = confusion_matrix(y_test, y_pred)
-    report = classification_report(y_test, y_pred, output_dict=True)
+    cm = np.asarray(confusion_matrix(y_test, y_pred), dtype=int)
+    report_raw = classification_report(y_test, y_pred, output_dict=True)
+    report = cast(dict[str, Any], report_raw)
     acc = float(accuracy_score(y_test, y_pred))
     macro_f1 = float(f1_score(y_test, y_pred, average="macro"))
 
     # 2. Boundary vs. Severe Misclassification Breakdown (PRD Chapter 15.1)
-    y_true_arr = y_test.to_numpy()
+    y_true_arr = np.asarray(y_test, dtype=int)
     y_pred_arr = np.asarray(y_pred, dtype=int)
     tier_diffs = np.abs(y_pred_arr - y_true_arr)
 
@@ -77,7 +85,8 @@ def run_error_analysis() -> dict:
     adjacent_pairs: dict[str, int] = {}
     for actual, pred in [(0, 1), (1, 0), (1, 2), (2, 1), (2, 3), (3, 2)]:
         count = int(cm[actual, pred])
-        adjacent_pairs[f"Tier {actual} ({TIER_LABELS[actual]}) -> Tier {pred} ({TIER_LABELS[pred]})"] = count
+        key = f"Tier {actual} ({TIER_LABELS[actual]}) -> Tier {pred} ({TIER_LABELS[pred]})"
+        adjacent_pairs[key] = count
 
     # Confidence analysis on correct vs. misclassified samples
     max_probs = np.max(y_proba, axis=1)
@@ -90,21 +99,24 @@ def run_error_analysis() -> dict:
     median_conf_errors = float(np.median(max_probs[error_mask])) if n_errors > 0 else 0.0
 
     # Collect detailed misclassified examples
-    X_test_reset = X_test.reset_index(drop=True)
-    misclassified_samples = []
-    for idx in np.where(error_mask)[0]:
-        row_specs = X_test_reset.iloc[idx][SELECTED_FEATURES].to_dict()
-        probs = [round(float(p), 4) for p in y_proba[idx]]
+    misclassified_samples: list[dict[str, Any]] = []
+    error_indices = [int(i) for i in np.flatnonzero(error_mask).tolist()]
+    for idx in error_indices:
+        row_series = X_test_df.iloc[idx]
+        selected_specs = {col: float(row_series[col]) for col in SELECTED_FEATURES}
+        probs = [round(float(p), 4) for p in y_proba[idx].tolist()]
+        true_tier = int(y_true_arr[idx])
+        pred_tier = int(y_pred_arr[idx])
         misclassified_samples.append(
             {
-                "test_index": int(idx),
-                "actual_tier": int(y_true_arr[idx]),
-                "predicted_tier": int(y_pred_arr[idx]),
+                "test_index": idx,
+                "actual_tier": true_tier,
+                "predicted_tier": pred_tier,
                 "tier_step_error": int(tier_diffs[idx]),
                 "max_probability": round(float(max_probs[idx]), 4),
-                "true_class_probability": round(float(y_proba[idx, y_true_arr[idx]]), 4),
+                "true_class_probability": round(float(y_proba[idx][true_tier]), 4),
                 "probabilities": probs,
-                "selected_specs": {k: float(v) for k, v in row_specs.items()},
+                "selected_specs": selected_specs,
             }
         )
 
@@ -112,32 +124,36 @@ def run_error_analysis() -> dict:
     ood_path = REPO_ROOT / "data" / "test_fixtures" / "out_of_distribution.csv"
     ood_df = pd.read_csv(ood_path)
     ood_X = ood_df[FEATURE_COLUMNS]
-    ood_preds = pipeline.predict(ood_X)
-    ood_probas = pipeline.predict_proba(ood_X)
+    ood_preds = np.asarray(pipeline.predict(ood_X), dtype=int)
+    ood_probas = np.asarray(pipeline.predict_proba(ood_X), dtype=float)
 
-    ood_results = []
-    for i, row in ood_df.iterrows():
-        pred_tier = int(ood_preds[i])
-        probs = [round(float(p), 4) for p in ood_probas[i]]
-        max_p = round(float(np.max(ood_probas[i])), 4)
+    ood_results: list[dict[str, Any]] = []
+    for row_idx in range(len(ood_df)):
+        row = ood_df.iloc[row_idx]
+        pred_tier = int(ood_preds[row_idx])
+        row_proba = ood_probas[row_idx]
+        probs = [round(float(p), 4) for p in row_proba.tolist()]
+        max_p = round(float(np.max(row_proba)), 4)
         # Shannon entropy across 4 classes (max entropy = ln(4) ≈ 1.3863)
-        clipped = np.clip(ood_probas[i], 1e-9, 1.0)
+        clipped = np.clip(row_proba, 1e-9, 1.0)
         entropy = float(-np.sum(clipped * np.log(clipped)))
 
-        row_dict = {col: float(row[col]) for col in FEATURE_COLUMNS}
-        shap_info = explain_prediction(row_dict, target_class=pred_tier, pipeline=pipeline)
+        row_dict: dict[str, Any] = {col: float(row[col]) for col in FEATURE_COLUMNS}
+        shap_info = explain_prediction(
+            row_dict, target_class=pred_tier, pipeline=pipeline
+        )
         top_attributions = [
             {
                 "feature": a.feature,
                 "feature_value": a.feature_value,
-                "shap_value": round(a.shap_value, 4),
+                "shap_value": round(float(a.shap_value), 4),
             }
             for a in shap_info["attributions"]
         ]
 
         ood_results.append(
             {
-                "row_index": int(i),
+                "row_index": row_idx,
                 "edge_case_type": str(row["edge_case_type"]),
                 "selected_specs": {
                     col: float(row[col]) for col in SELECTED_FEATURES
@@ -155,8 +171,8 @@ def run_error_analysis() -> dict:
     boundary_path = REPO_ROOT / "data" / "test_fixtures" / "boundary_valid.csv"
     boundary_df = pd.read_csv(boundary_path)
     boundary_X = boundary_df[FEATURE_COLUMNS]
-    boundary_preds = pipeline.predict(boundary_X)
-    boundary_probas = pipeline.predict_proba(boundary_X)
+    boundary_preds = np.asarray(pipeline.predict(boundary_X), dtype=int)
+    boundary_probas = np.asarray(pipeline.predict_proba(boundary_X), dtype=float)
 
     boundary_summary = {
         "n_rows": int(len(boundary_df)),
@@ -169,22 +185,24 @@ def run_error_analysis() -> dict:
         "max_confidence": round(float(np.max(np.max(boundary_probas, axis=1))), 4),
     }
 
-    output = {
+    per_class_metrics: dict[str, dict[str, float | int]] = {}
+    for t in range(4):
+        tier_rep = cast(dict[str, Any], report.get(str(t), {}))
+        per_class_metrics[f"Tier {t} ({TIER_LABELS[t]})"] = {
+            "precision": round(float(tier_rep.get("precision", 0.0)), 4),
+            "recall": round(float(tier_rep.get("recall", 0.0)), 4),
+            "f1_score": round(float(tier_rep.get("f1-score", 0.0)), 4),
+            "support": int(float(tier_rep.get("support", 0))),
+        }
+
+    output: dict[str, Any] = {
         "model_version": "v2.0.0-rfecv",
         "artifact_path": "artifacts/tuned_rfecv_rf.joblib",
         "test_set_size": n_total,
         "holdout_accuracy": acc,
         "holdout_macro_f1": macro_f1,
         "confusion_matrix": cm.tolist(),
-        "per_class_metrics": {
-            f"Tier {t} ({TIER_LABELS[t]})": {
-                "precision": round(float(report[str(t)]["precision"]), 4),
-                "recall": round(float(report[str(t)]["recall"]), 4),
-                "f1_score": round(float(report[str(t)]["f1-score"]), 4),
-                "support": int(report[str(t)]["support"]),
-            }
-            for t in range(4)
-        },
+        "per_class_metrics": per_class_metrics,
         "error_severity_breakdown": {
             "total_samples": n_total,
             "correct_predictions": n_correct,

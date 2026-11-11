@@ -23,13 +23,16 @@ from fastapi.testclient import TestClient
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_ROOT))
 
+# pyrefly: ignore [missing-import]
 from app.auth.jwt_handler import (  # noqa: E402
     SEEDED_PASSWORD,
     SEEDED_USERNAME,
     create_access_token,
     seed_analyst_user,
 )
+# pyrefly: ignore [missing-import]
 from app.db.session import init_db  # noqa: E402
+# pyrefly: ignore [missing-import]
 from app.main import app  # noqa: E402
 
 VALID_PREDICT_PAYLOAD = {
@@ -170,6 +173,7 @@ class TestAuthenticatedAccess:
         assert explain_resp.status_code == 200, explain_resp.text
         assert explain_resp.json()["prediction_id"] == pred_id
 
+    # pyrefly: ignore[parse-error]
     def test_authenticated_whatif_succeeds(self, unauth_client):
         token = create_access_token()
         headers = {"Authorization": f"Bearer {token}"}

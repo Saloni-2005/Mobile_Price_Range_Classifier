@@ -22,11 +22,17 @@ from fastapi.testclient import TestClient
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_ROOT))
 
+# pyrefly: ignore [missing-import]
 from app.auth.jwt_handler import create_access_token  # noqa: E402
+# pyrefly: ignore [missing-import]
 from app.db.models import WhatIfSimulation  # noqa: E402
+# pyrefly: ignore [missing-import]
 from app.db.session import SessionLocal, init_db  # noqa: E402
+# pyrefly: ignore [missing-import]
 from app.main import app  # noqa: E402
+# pyrefly: ignore [missing-import]
 from app.services import inference  # noqa: E402
+# pyrefly: ignore [missing-import]
 from app.services.margin_model import (  # noqa: E402
     compute_whatif_margin_delta,
     detect_extrapolated_features,
