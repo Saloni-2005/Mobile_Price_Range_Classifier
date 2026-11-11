@@ -249,8 +249,6 @@ def get_feature_importance() -> list[dict]:
     - tuned pipeline: ColumnTransformer whose transformers list column names
     - baseline pipeline: ColumnTransformer over all FEATURE_COLUMNS
     """
-    import numpy as np
-
     pipeline = load_model()
     clf = pipeline.named_steps["clf"]
     preprocessor = pipeline.named_steps["preprocess"]

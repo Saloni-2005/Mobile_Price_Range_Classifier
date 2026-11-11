@@ -77,7 +77,9 @@ export default function FeatureImportanceChart() {
             <span className="accent-label text-[0.7rem] font-semibold tracking-[0.14em] uppercase">
               Module 02
             </span>
-            <span className="phase-chip text-[0.65rem]">Active Model</span>
+            <span className="phase-chip text-[0.65rem]">
+              {modelVersion || 'Active Model'}
+            </span>
           </div>
           <h2 className="font-display mt-1 text-xl font-bold">
             Global Feature Importance

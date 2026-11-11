@@ -10,7 +10,6 @@ Performs:
 """
 
 from pathlib import Path
-import json
 import numpy as np
 import pandas as pd
 
@@ -76,12 +75,14 @@ def clean_datasets():
 
     # 3. Learn imputation statistics from Train set only (avoid leakage)
     valid_sc_w = train_df[train_df["sc_w"] > 0]
-    sc_w_median_by_sch = valid_sc_w.groupby("sc_h")["sc_w"].median().to_dict()
-    global_sc_w_median = valid_sc_w["sc_w"].median()
+    sc_w_median_by_sch: dict[int, float] = (
+        valid_sc_w.groupby("sc_h")["sc_w"].median().to_dict()
+    )
+    global_sc_w_median = float(valid_sc_w["sc_w"].median())
 
     valid_px_h = train_df[train_df["px_height"] > 0]
     aspect_ratios = valid_px_h["px_height"] / valid_px_h["px_width"]
-    median_aspect_ratio = aspect_ratios.median()
+    median_aspect_ratio = float(aspect_ratios.median())
 
     print("\n[Imputation Rules Learned from Training Set]")
     print(f" - Global median sc_w: {global_sc_w_median} cm")
@@ -92,18 +93,18 @@ def clean_datasets():
         cleaned = df.copy()
 
         # Impute sc_w == 0
-        def impute_sc_w(row):
+        def impute_sc_w(row) -> float:
             if row["sc_w"] == 0:
-                return sc_w_median_by_sch.get(row["sc_h"], global_sc_w_median)
-            return row["sc_w"]
+                return float(sc_w_median_by_sch.get(int(row["sc_h"]), global_sc_w_median))
+            return float(row["sc_w"])
 
         cleaned["sc_w"] = cleaned.apply(impute_sc_w, axis=1)
 
         # Impute px_height == 0
-        def impute_px_h(row):
+        def impute_px_h(row) -> int:
             if row["px_height"] == 0:
-                return round(row["px_width"] * median_aspect_ratio)
-            return row["px_height"]
+                return int(round(float(row["px_width"]) * median_aspect_ratio))
+            return int(row["px_height"])
 
         cleaned["px_height"] = cleaned.apply(impute_px_h, axis=1)
 

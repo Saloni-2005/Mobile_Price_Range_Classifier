@@ -174,6 +174,7 @@ export default function WhatIfPage() {
       <div className="grid gap-6 lg:grid-cols-12">
         <div className="lg:col-span-6">
           <WhatIfSliders
+            key={baselinePrediction?.prediction_id ?? 'default'}
             baselineSpecs={baselineSpecs}
             baselinePredictionId={baselinePrediction?.prediction_id}
             onSimulate={handleSimulate}

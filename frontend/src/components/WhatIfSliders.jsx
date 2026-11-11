@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
  * RFE-selected numeric features with observed training bounds (PRD Ch. 12 / 15.3)
  * and extended slider bounds to allow testing extrapolation behavior.
  */
-export const RFE_SLIDER_CONFIG = [
+const RFE_SLIDER_CONFIG = [
   {
     name: 'ram',
     label: 'System RAM',
@@ -86,19 +86,6 @@ export default function WhatIfSliders({
   })
 
   const debounceRef = useRef(null)
-
-  // Sync slider values when baselineSpecs change (e.g., new baseline prediction loaded)
-  useEffect(() => {
-    if (!baselineSpecs) return
-    const synced = {}
-    RFE_SLIDER_CONFIG.forEach((cfg) => {
-      synced[cfg.name] =
-        baselineSpecs[cfg.name] !== undefined
-          ? Number(baselineSpecs[cfg.name])
-          : cfg.defaultValue
-    })
-    setValues(synced)
-  }, [baselineSpecs, baselinePredictionId])
 
   const triggerDebouncedSimulate = (nextValues) => {
     if (!onSimulate || !baselinePredictionId) return

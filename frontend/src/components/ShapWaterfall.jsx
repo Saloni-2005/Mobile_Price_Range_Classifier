@@ -29,21 +29,15 @@ export default function ShapWaterfall({ predictionId }) {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    if (!predictionId) {
-      setExplanation(null)
-      setError(null)
-      setLoading(false)
-      return
-    }
+    if (!predictionId) return
 
     let isMounted = true
-    setLoading(true)
-    setError(null)
 
     getExplanation(predictionId)
       .then((res) => {
         if (!isMounted) return
         setExplanation(res)
+        setError(null)
         setLoading(false)
       })
       .catch((err) => {

@@ -21,8 +21,6 @@ from app.schemas.prediction import (
 )
 from app.services.inference import (
     FEATURE_COLUMNS,
-    get_active_artifact_path,
-    get_active_model_version,
     load_model,
 )
 

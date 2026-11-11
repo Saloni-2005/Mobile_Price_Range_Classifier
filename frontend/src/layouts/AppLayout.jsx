@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import ThemeToggle from '../components/ThemeToggle'
-import { checkHealth } from '../api/client'
+import {
+  checkHealth,
+  ensureAuthToken,
+  getAuthStatus,
+  logoutAnalyst,
+} from '../api/client'
 
 const NAV_ITEMS = [
   {
@@ -11,6 +16,16 @@ const NAV_ITEMS = [
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+      </svg>
+    ),
+  },
+  {
+    path: '/login',
+    label: 'Analyst Auth',
+    badge: 'JWT',
+    icon: (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
       </svg>
     ),
   },
@@ -47,7 +62,7 @@ const NAV_ITEMS = [
   {
     path: '/what-if',
     label: 'What-If Sandbox',
-    badge: 'Preview',
+    badge: 'Module 04',
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -69,12 +84,23 @@ const NAV_ITEMS = [
 export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [apiOnline, setApiOnline] = useState(null)
+  const [authState, setAuthState] = useState(() => getAuthStatus())
   const location = useLocation()
+  const navigate = useNavigate()
 
   useEffect(() => {
+    const syncAuth = () => setAuthState(getAuthStatus())
+    window.addEventListener('tierlab-auth-change', syncAuth)
+
     checkHealth()
-      .then(() => setApiOnline(true))
+      .then(() => {
+        setApiOnline(true)
+        return ensureAuthToken()
+      })
+      .then(() => setAuthState(getAuthStatus()))
       .catch(() => setApiOnline(false))
+
+    return () => window.removeEventListener('tierlab-auth-change', syncAuth)
   }, [])
 
   // Auto-close on small screens when clicking a link
@@ -82,6 +108,12 @@ export default function AppLayout() {
     if (window.innerWidth < 768) {
       setSidebarOpen(false)
     }
+  }
+
+  const handleQuickLogout = () => {
+    logoutAnalyst()
+    setAuthState(getAuthStatus())
+    navigate('/login')
   }
 
   return (
@@ -142,7 +174,7 @@ export default function AppLayout() {
               </span>
               <span className="text-xs font-semibold">Production Model</span>
             </div>
-            <span className="phase-chip text-[0.6rem]">Active</span>
+            <span className="phase-chip text-[0.6rem]">v2.0.0-rfecv</span>
           </div>
 
           {/* Navigation Links */}
@@ -179,9 +211,37 @@ export default function AppLayout() {
           </nav>
         </div>
 
-        {/* Footer Area: API Health + Theme Toggle */}
+        {/* Footer Area: Analyst Auth + API Health + Theme Toggle */}
         <div className="w-72 p-4 border-t border-[var(--color-line)] space-y-3">
           <div className="flex items-center justify-between text-xs">
+            <span className="text-[var(--color-ink-soft)] text-[0.7rem]">Analyst Auth:</span>
+            {authState.isAuthenticated ? (
+              <div className="flex items-center gap-2">
+                <NavLink
+                  to="/login"
+                  className="text-[0.7rem] font-mono font-semibold text-emerald-600 no-underline hover:underline"
+                >
+                  🔒 {authState.username}
+                </NavLink>
+                <button
+                  type="button"
+                  onClick={handleQuickLogout}
+                  className="text-[0.65rem] px-1.5 py-0.5 rounded border border-rose-500/40 text-rose-600 hover:bg-rose-500/10 cursor-pointer"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <NavLink
+                to="/login"
+                className="text-[0.7rem] font-semibold text-amber-600 no-underline hover:underline"
+              >
+                🔓 Sign In →
+              </NavLink>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between text-xs pt-2 border-t border-[var(--color-line)]">
             <span className="text-[var(--color-ink-soft)] text-[0.7rem]">Backend Status:</span>
             <span className="flex items-center gap-1.5 font-medium text-[0.7rem]">
               <span
@@ -205,7 +265,7 @@ export default function AppLayout() {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
-        {/* Top Control Bar (Always visible or shows toggle when sidebar is closed) */}
+        {/* Top Control Bar */}
         <header className="border-b border-[var(--color-line)] bg-[var(--color-panel-solid)]/80 backdrop-blur-md px-4 sm:px-6 py-2.5 flex items-center justify-between sticky top-0 z-30 transition-all">
           <div className="flex items-center gap-3">
             {/* Toggle Button to open sidebar */}
@@ -237,12 +297,34 @@ export default function AppLayout() {
             )}
           </div>
 
-          {/* Right Header Controls */}
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full border border-[var(--color-line)] text-[0.65rem] bg-[var(--color-field-bg)]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
-              <span className="font-medium text-[var(--color-ink-soft)]">Production Pipeline</span>
-            </div>
+          {/* Right Header Controls: Visible Analyst Auth Pill + Theme Toggle */}
+          <div className="flex items-center gap-2.5">
+            {authState.isAuthenticated ? (
+              <div className="flex items-center gap-2 px-2.5 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-[0.68rem]">
+                <NavLink
+                  to="/login"
+                  className="flex items-center gap-1.5 font-mono font-semibold text-emerald-600 no-underline"
+                  title="View active HS256 JWT session"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span>Analyst: {authState.username} (JWT)</span>
+                </NavLink>
+                <button
+                  type="button"
+                  onClick={handleQuickLogout}
+                  className="ml-1 pl-2 border-l border-emerald-500/30 text-rose-600 hover:underline font-semibold cursor-pointer"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <NavLink
+                to="/login"
+                className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-amber-500/40 bg-amber-500/15 text-amber-600 text-xs font-semibold no-underline hover:bg-amber-500/25 transition-all"
+              >
+                <span>🔓 Sign In (Analyst JWT)</span>
+              </NavLink>
+            )}
             <ThemeToggle />
           </div>
         </header>

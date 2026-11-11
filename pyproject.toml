@@ -1,0 +1,23 @@
+[project]
+name = "mobile-price-range-classifier"
+version = "1.0.0"
+description = "Assisted Pricing Optimization Engine — Mobile Price-Range Classifier"
+readme = "README.md"
+requires-python = ">=3.11"
+
+[tool.pyrefly]
+search-path = ["backend", "."]
+project-includes = ["backend", "scripts"]
+
+[tool.pyright]
+include = ["backend", "scripts"]
+extraPaths = ["backend", "."]
+pythonVersion = "3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["backend", "."]
+testpaths = ["backend/tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

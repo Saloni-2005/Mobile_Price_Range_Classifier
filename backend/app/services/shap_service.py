@@ -18,13 +18,13 @@ _mpl_cache = Path(__file__).resolve().parents[3] / "artifacts" / ".matplotlib_ca
 _mpl_cache.mkdir(parents=True, exist_ok=True)
 os.environ.setdefault("MPLCONFIGDIR", str(_mpl_cache))
 
-import numpy as np
-import pandas as pd
-import shap
-from sklearn.pipeline import Pipeline
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
+import shap  # noqa: E402
+from sklearn.pipeline import Pipeline  # noqa: E402
 
-from app.schemas.prediction import TIER_LABELS, FeatureAttribution
-from app.services.inference import FEATURE_COLUMNS, load_model
+from app.schemas.prediction import TIER_LABELS, FeatureAttribution  # noqa: E402
+from app.services.inference import FEATURE_COLUMNS, load_model  # noqa: E402
 
 _cached_explainer: shap.TreeExplainer | None = None
 _cached_model_id: int | None = None

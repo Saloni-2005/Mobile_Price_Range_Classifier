@@ -6,6 +6,7 @@ import FeaturesPage from './pages/FeaturesPage'
 import ExplainPage from './pages/ExplainPage'
 import WhatIfPage from './pages/WhatIfPage'
 import ModelCardPage from './pages/ModelCardPage'
+import LoginPage from './pages/LoginPage'
 
 export default function App() {
   return (
@@ -13,11 +14,13 @@ export default function App() {
       <Routes>
         <Route path="/" element={<AppLayout />}>
           <Route index element={<HomePage />} />
+          <Route path="login" element={<LoginPage />} />
           <Route path="predict" element={<PredictPage />} />
           <Route path="features" element={<FeaturesPage />} />
           <Route path="explain" element={<ExplainPage />} />
           <Route path="explain/:predictionId" element={<ExplainPage />} />
           <Route path="what-if" element={<WhatIfPage />} />
+          <Route path="whatif" element={<WhatIfPage />} />
           <Route path="model-card" element={<ModelCardPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

@@ -7,6 +7,7 @@ Registers routers and loads the model artifact at startup when available.
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import auth, explain, health, importance, predict, whatif
 from app.auth.jwt_handler import seed_analyst_user
@@ -32,8 +33,6 @@ app = FastAPI(
     description="Assisted Pricing Optimization Engine — Mobile Price-Range Classifier",
     lifespan=lifespan,
 )
-
-from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,

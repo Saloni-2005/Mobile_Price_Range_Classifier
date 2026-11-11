@@ -40,7 +40,7 @@ export default function PredictPage() {
             <button
               type="button"
               onClick={() =>
-                navigate(`/whatif?predictionId=${latestPrediction.prediction_id}`)
+                navigate(`/what-if?predictionId=${latestPrediction.prediction_id}`)
               }
               className="text-xs py-2 px-3.5 rounded-xl border border-[var(--color-accent)] text-[var(--color-accent)] font-semibold hover:bg-[var(--color-accent)]/10 transition-all cursor-pointer"
             >

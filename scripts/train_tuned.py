@@ -32,9 +32,9 @@ from sklearn.preprocessing import StandardScaler
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "backend"))
 
-from app.db.models import ModelRegistry
-from app.db.session import SessionLocal, init_db
-from app.services.inference import (
+from app.db.models import ModelRegistry  # noqa: E402
+from app.db.session import SessionLocal, init_db  # noqa: E402
+from app.services.inference import (  # noqa: E402
     FEATURE_COLUMNS,
     RANDOM_STATE,
     TARGET_COLUMN,
@@ -61,8 +61,12 @@ def run_tuned_pipeline():
 
     # Scale for RFECV
     scaler = StandardScaler()
-    X_train_scaled = pd.DataFrame(scaler.fit_transform(X_train), columns=FEATURE_COLUMNS)
-    X_test_scaled = pd.DataFrame(scaler.transform(X_test), columns=FEATURE_COLUMNS)
+    X_train_scaled = pd.DataFrame(
+        scaler.fit_transform(X_train), columns=pd.Index(FEATURE_COLUMNS)
+    )
+    X_test_scaled = pd.DataFrame(
+        scaler.transform(X_test), columns=pd.Index(FEATURE_COLUMNS)
+    )
 
     # 3. RFECV feature selection
     print("\n[Step 1] Running RFECV feature selection (cv=5, scoring='f1_macro')...")
@@ -229,7 +233,10 @@ def run_tuned_pipeline():
 
         db.commit()
         active = db.query(ModelRegistry).filter_by(is_active=True).first()
-        print(f"-> Active model in registry: id={active.id}, tag={active.version_tag}, path={active.artifact_path}")
+        if active is not None:
+            print(
+                f"-> Active model in registry: id={active.id}, tag={active.version_tag}, path={active.artifact_path}"
+            )
     finally:
         db.close()
 
