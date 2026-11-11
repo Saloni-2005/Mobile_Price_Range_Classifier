@@ -11,6 +11,8 @@ export default defineConfig({
       '/feature-importance': 'http://localhost:8000',
       '/health': 'http://localhost:8000',
       '/explain': 'http://localhost:8000',
+      '/auth': 'http://localhost:8000',
+      '/whatif': 'http://localhost:8000',
     },
   },
 })

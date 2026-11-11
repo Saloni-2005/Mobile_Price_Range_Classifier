@@ -9,6 +9,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.orm import Session
 
+from app.auth.jwt_handler import require_analyst_jwt
 from app.db.models import ModelRegistry, Prediction
 from app.db.session import SessionLocal, init_db
 from app.schemas.prediction import ExplainResponse
@@ -31,6 +32,7 @@ def get_db():
 def explain(
     prediction_id: int = Path(..., ge=1, description="Unique prediction row ID"),
     db: Session = Depends(get_db),
+    _claims: dict = Depends(require_analyst_jwt),
 ) -> ExplainResponse:
     """
     Retrieve TreeSHAP local feature attributions for a logged prediction.

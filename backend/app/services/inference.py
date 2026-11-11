@@ -196,7 +196,11 @@ def load_model(path: Path | None = None, *, force_reload: bool = False) -> Pipel
 
 def is_model_loadable(path: Path | None = None) -> bool:
     """Return True if the model artifact exists and can be loaded via joblib."""
-    artifact = path or get_active_artifact_path()
+    artifact = path or DEFAULT_ARTIFACT_PATH
+    if not artifact.exists():
+        return False
+    if _model is not None:
+        return True
     try:
         load_model(artifact)
         return True

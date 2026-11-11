@@ -103,10 +103,14 @@ SAMPLE_PAYLOAD_HIGH = {
 @pytest.fixture(scope="module")
 def client():
     """Module-scoped TestClient ensuring active tuned pipeline is loaded."""
+    from app.auth.jwt_handler import create_access_token
+
     init_db()
     inference.clear_model_cache()
     clear_explainer_cache()
-    return TestClient(app)
+    test_client = TestClient(app)
+    test_client.headers.update({"Authorization": f"Bearer {create_access_token()}"})
+    return test_client
 
 
 @pytest.fixture(scope="module")

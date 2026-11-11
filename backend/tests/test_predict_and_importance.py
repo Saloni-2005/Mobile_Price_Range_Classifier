@@ -65,10 +65,14 @@ def client():
     assert TUNED_ARTIFACT.exists(), (
         f"Tuned artifact missing: {TUNED_ARTIFACT}. Run: python scripts/train_tuned.py"
     )
+    from app.auth.jwt_handler import create_access_token
+
     # Ensure the module-level cache is primed with the tuned pipeline
     inference.clear_model_cache()
     inference._REPO_ROOT  # touch module to ensure init
-    return TestClient(app)
+    test_client = TestClient(app)
+    test_client.headers.update({"Authorization": f"Bearer {create_access_token()}"})
+    return test_client
 
 
 # ---------------------------------------------------------------------------

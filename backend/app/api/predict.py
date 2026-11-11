@@ -11,6 +11,7 @@ import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app.auth.jwt_handler import require_analyst_jwt
 from app.db.models import ModelRegistry, Prediction
 from app.db.session import SessionLocal, init_db
 from app.schemas.prediction import (
@@ -46,7 +47,11 @@ def get_db():
 # ---------------------------------------------------------------------------
 
 @router.post("/predict", response_model=PredictResponse, status_code=200)
-def predict(body: PredictRequest, db: Session = Depends(get_db)) -> PredictResponse:
+def predict(
+    body: PredictRequest,
+    db: Session = Depends(get_db),
+    _claims: dict = Depends(require_analyst_jwt),
+) -> PredictResponse:
     """
     Predict mobile price tier from device specifications.
 
