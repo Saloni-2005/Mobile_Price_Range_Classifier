@@ -93,3 +93,35 @@ class FeatureImportanceResponse(BaseModel):
     features: list[FeatureImportanceItem]
     model_version: str
     n_selected: int
+
+
+# ---------------------------------------------------------------------------
+# Response schema — GET /explain/{prediction_id} (PRD Ch. 11 / 14)
+# ---------------------------------------------------------------------------
+
+class FeatureAttribution(BaseModel):
+    """Local attribution (SHAP value) for a single feature."""
+
+    feature: str = Field(..., description="Feature name")
+    shap_value: float = Field(..., description="Shapley contribution value to predicted class")
+    feature_value: float | int | None = Field(
+        default=None, description="Actual feature value for this prediction"
+    )
+
+
+class ExplainResponse(BaseModel):
+    """Local TreeSHAP explanation decomposing prediction into feature attributions."""
+
+    prediction_id: int = Field(..., description="Row id from predictions table")
+    predicted_tier: int = Field(..., ge=0, le=3, description="Predicted price-range class (0–3)")
+    tier_label: str = Field(..., description="Human-readable tier label")
+    base_value: float = Field(
+        ..., description="Expected value / base probability across training data"
+    )
+    predicted_probability: float = Field(
+        ..., description="Model probability for the predicted tier"
+    )
+    attributions: list[FeatureAttribution] = Field(
+        ..., description="Feature attributions ordered by absolute magnitude"
+    )
+    model_version: str = Field(..., description="Active model version tag from model_registry")

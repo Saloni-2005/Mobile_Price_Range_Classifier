@@ -15,6 +15,7 @@ openapi.json
 # Node / frontend
 node_modules/
 frontend/dist/
+artifacts/.matplotlib_cache/
 
 # C extensions
 *.so
