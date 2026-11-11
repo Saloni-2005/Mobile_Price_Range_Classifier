@@ -125,3 +125,84 @@ class ExplainResponse(BaseModel):
         ..., description="Feature attributions ordered by absolute magnitude"
     )
     model_version: str = Field(..., description="Active model version tag from model_registry")
+
+
+# ---------------------------------------------------------------------------
+# Request & Response schemas — POST /whatif (PRD Ch. 5.2, 5.3, 11, 15.3)
+# ---------------------------------------------------------------------------
+
+VALID_FEATURE_NAMES: set[str] = set(PredictRequest.model_fields.keys())
+
+
+class WhatIfRequest(BaseModel):
+    """
+    Request payload for POST /whatif: baseline prediction ID + one or more
+    specification adjustments (slider deltas).
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    baseline_prediction_id: int = Field(
+        ..., ge=1, description="Existing row id in the predictions table"
+    )
+    adjustments: dict[str, float | int] = Field(
+        ...,
+        min_length=1,
+        description="Map of feature_name -> adjusted value",
+    )
+
+
+class WhatIfResponse(BaseModel):
+    """
+    What-if simulation response returning the new predicted tier, probability
+    shift, illustrative margin delta, and extrapolation warnings.
+    """
+
+    simulation_id: int = Field(..., description="Row id from whatif_simulations table")
+    baseline_prediction_id: int = Field(..., description="Baseline prediction row id")
+    baseline_tier: int = Field(..., ge=0, le=3)
+    baseline_label: str
+    baseline_probabilities: list[float]
+
+    predicted_tier: int = Field(..., ge=0, le=3, description="Resulting predicted tier (0–3)")
+    predicted_price_range: int = Field(..., ge=0, le=3, description="Alias per PRD Ch. 11")
+    tier_label: str = Field(..., description="Human-readable resulting tier label")
+    label: str = Field(..., description="Alias per PRD Ch. 11")
+    probabilities: list[float] = Field(..., description="Resulting class probabilities")
+    class_probabilities: list[float] = Field(..., description="Alias per PRD Ch. 11")
+    probability_shifts: list[float] = Field(
+        ..., description="Per-class probability delta (adjusted - baseline)"
+    )
+
+    margin_estimate: float = Field(
+        ..., description="Illustrative resulting gross margin (USD)"
+    )
+    margin_estimate_delta: float = Field(
+        ..., description="Illustrative margin shift vs. baseline (USD)"
+    )
+    margin_pct_delta: float = Field(
+        ..., description="Illustrative gross margin percentage-point shift"
+    )
+    baseline_bom_usd: float
+    adjusted_bom_usd: float
+    bom_cost_delta_usd: float
+    baseline_tier_midpoint_usd: float
+    resulting_tier_midpoint_usd: float
+
+    adjusted_specs: dict[str, float | int]
+    is_extrapolated: bool = Field(
+        ..., description="True if any spec falls outside training dataset bounds (PRD Ch. 15.3)"
+    )
+    extrapolated_features: list[str] = Field(
+        default_factory=list,
+        description="Features pushed outside the observed training range",
+    )
+    is_illustrative: bool = Field(
+        default=True,
+        description="Always True — marks cost/margin figures as illustrative (PRD Ch. 5.3)",
+    )
+    caveat: str = Field(
+        ...,
+        description="Mandatory visible disclaimer that margin figures are illustrative, not real BOM",
+    )
+    model_version: str

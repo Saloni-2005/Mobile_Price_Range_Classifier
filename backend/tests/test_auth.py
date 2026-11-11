@@ -170,15 +170,21 @@ class TestAuthenticatedAccess:
         assert explain_resp.status_code == 200, explain_resp.text
         assert explain_resp.json()["prediction_id"] == pred_id
 
-    def test_authenticated_whatif_raises_not_implemented(self, unauth_client):
+    def test_authenticated_whatif_succeeds(self, unauth_client):
         token = create_access_token()
         headers = {"Authorization": f"Bearer {token}"}
-        with pytest.raises(NotImplementedError):
-            unauth_client.post(
-                "/whatif",
-                json={"baseline_prediction_id": 1, "adjustments": {"ram": 3500}},
-                headers=headers,
-            )
+        pred_resp = unauth_client.post(
+            "/predict", json=VALID_PREDICT_PAYLOAD, headers=headers
+        )
+        assert pred_resp.status_code == 200
+        pred_id = pred_resp.json()["prediction_id"]
+
+        whatif_resp = unauth_client.post(
+            "/whatif",
+            json={"baseline_prediction_id": pred_id, "adjustments": {"ram": 3500}},
+            headers=headers,
+        )
+        assert whatif_resp.status_code == 200, whatif_resp.text
 
 
 # ---------------------------------------------------------------------------
@@ -194,3 +200,4 @@ class TestPublicEndpoints:
         resp = unauth_client.get("/feature-importance")
         assert resp.status_code == 200
         assert "features" in resp.json()
+

@@ -29,13 +29,24 @@ export default function PredictPage() {
         </div>
 
         {latestPrediction && (
-          <button
-            type="button"
-            onClick={() => navigate(`/explain/${latestPrediction.prediction_id}`)}
-            className="cta-primary text-xs py-2 px-3.5 self-start sm:self-auto cursor-pointer animate-rise"
-          >
-            Explain #{latestPrediction.prediction_id} in TreeSHAP →
-          </button>
+          <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto animate-rise">
+            <button
+              type="button"
+              onClick={() => navigate(`/explain/${latestPrediction.prediction_id}`)}
+              className="cta-primary text-xs py-2 px-3.5 cursor-pointer"
+            >
+              Explain #{latestPrediction.prediction_id} in TreeSHAP →
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                navigate(`/whatif?predictionId=${latestPrediction.prediction_id}`)
+              }
+              className="text-xs py-2 px-3.5 rounded-xl border border-[var(--color-accent)] text-[var(--color-accent)] font-semibold hover:bg-[var(--color-accent)]/10 transition-all cursor-pointer"
+            >
+              Simulate #{latestPrediction.prediction_id} in What-If →
+            </button>
+          </div>
         )}
       </div>
 

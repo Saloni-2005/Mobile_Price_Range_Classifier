@@ -82,6 +82,26 @@ export async function getExplanation(predictionId) {
   }
 }
 
+export async function runWhatIf(baselinePredictionId, adjustments) {
+  await ensureAuthToken()
+  const payload = {
+    baseline_prediction_id: Number(baselinePredictionId),
+    adjustments,
+  }
+  try {
+    const response = await apiClient.post('/whatif', payload)
+    return response.data
+  } catch (err) {
+    if (err.response?.status === 401) {
+      logoutAnalyst()
+      await loginAnalyst()
+      const retry = await apiClient.post('/whatif', payload)
+      return retry.data
+    }
+    throw err
+  }
+}
+
 export async function checkHealth() {
   const response = await apiClient.get('/health')
   return response.data
