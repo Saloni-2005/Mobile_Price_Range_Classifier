@@ -277,7 +277,7 @@ export default function WhatIfSliders({
 
               <input
                 id={`slider-${cfg.name}`}
-                className="slider-track w-full cursor-pointer"
+                className="slider-track w-full"
                 type="range"
                 min={cfg.sliderMin}
                 max={cfg.sliderMax}
