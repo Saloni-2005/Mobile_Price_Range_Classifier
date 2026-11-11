@@ -84,13 +84,13 @@ export default function ModelCardPage() {
           <h2 className="font-display text-lg font-bold">Confusion Matrix (400 Test Units)</h2>
           <div className="font-mono text-xs p-3 rounded-xl bg-[var(--color-field-bg)] border border-[var(--color-line)] overflow-x-auto leading-relaxed">
             <div>                Pred 0  Pred 1  Pred 2  Pred 3</div>
-            <div className="text-emerald-600 font-semibold">Actual Tier 0:     96       4       0       0</div>
-            <div className="text-emerald-600 font-semibold">Actual Tier 1:      3      92       5       0</div>
-            <div className="text-emerald-600 font-semibold">Actual Tier 2:      0       7      87       6</div>
-            <div className="text-emerald-600 font-semibold">Actual Tier 3:      0       0       0     101</div>
+            <div className="text-emerald-600 font-semibold">Actual Tier 0:     99       1       0       0</div>
+            <div className="text-emerald-600 font-semibold">Actual Tier 1:      5      89       6       0</div>
+            <div className="text-emerald-600 font-semibold">Actual Tier 2:      0       4      93       3</div>
+            <div className="text-emerald-600 font-semibold">Actual Tier 3:      0       0       5      95</div>
           </div>
           <p className="text-[0.7rem] text-[var(--color-ink-soft)]">
-            High precision across all four tiers; tier 3 (flagship) achieved 100% recall with 0 misclassifications.
+            376/400 correct (94.00%). All 24 errors are adjacent 1-tier boundary shifts; 0 severe (2+-tier) misclassifications.
           </p>
         </section>
       </div>

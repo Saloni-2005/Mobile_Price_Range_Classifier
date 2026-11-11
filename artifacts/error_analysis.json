@@ -1,0 +1,750 @@
+{
+  "model_version": "v2.0.0-rfecv",
+  "artifact_path": "artifacts/tuned_rfecv_rf.joblib",
+  "test_set_size": 400,
+  "holdout_accuracy": 0.94,
+  "holdout_macro_f1": 0.9398686684920765,
+  "confusion_matrix": [
+    [
+      99,
+      1,
+      0,
+      0
+    ],
+    [
+      5,
+      89,
+      6,
+      0
+    ],
+    [
+      0,
+      4,
+      93,
+      3
+    ],
+    [
+      0,
+      0,
+      5,
+      95
+    ]
+  ],
+  "per_class_metrics": {
+    "Tier 0 (Low)": {
+      "precision": 0.9519,
+      "recall": 0.99,
+      "f1_score": 0.9706,
+      "support": 100
+    },
+    "Tier 1 (Mid)": {
+      "precision": 0.9468,
+      "recall": 0.89,
+      "f1_score": 0.9175,
+      "support": 100
+    },
+    "Tier 2 (Mid-High)": {
+      "precision": 0.8942,
+      "recall": 0.93,
+      "f1_score": 0.9118,
+      "support": 100
+    },
+    "Tier 3 (High)": {
+      "precision": 0.9694,
+      "recall": 0.95,
+      "f1_score": 0.9596,
+      "support": 100
+    }
+  },
+  "error_severity_breakdown": {
+    "total_samples": 400,
+    "correct_predictions": 376,
+    "total_errors": 24,
+    "error_rate_pct": 6.0,
+    "adjacent_tier_errors_count": 24,
+    "adjacent_tier_share_of_errors_pct": 100.0,
+    "adjacent_tier_rate_of_total_pct": 6.0,
+    "severe_2plus_tier_errors_count": 0,
+    "severe_2step_count": 0,
+    "severe_3step_count": 0,
+    "severe_share_of_errors_pct": 0.0,
+    "adjacent_direction_counts": {
+      "Tier 0 (Low) -> Tier 1 (Mid)": 1,
+      "Tier 1 (Mid) -> Tier 0 (Low)": 5,
+      "Tier 1 (Mid) -> Tier 2 (Mid-High)": 6,
+      "Tier 2 (Mid-High) -> Tier 1 (Mid)": 4,
+      "Tier 2 (Mid-High) -> Tier 3 (High)": 3,
+      "Tier 3 (High) -> Tier 2 (Mid-High)": 5
+    }
+  },
+  "confidence_analysis": {
+    "mean_confidence_correct": 0.8365,
+    "median_confidence_correct": 0.875,
+    "mean_confidence_errors": 0.6071,
+    "median_confidence_errors": 0.605
+  },
+  "misclassified_samples": [
+    {
+      "test_index": 65,
+      "actual_tier": 1,
+      "predicted_tier": 0,
+      "tier_step_error": 1,
+      "max_probability": 0.64,
+      "true_class_probability": 0.36,
+      "probabilities": [
+        0.64,
+        0.36,
+        0.0,
+        0.0
+      ],
+      "selected_specs": {
+        "battery_power": 1510.0,
+        "mobile_wt": 135.0,
+        "px_height": 963.0,
+        "px_width": 1520.0,
+        "ram": 854.0
+      }
+    },
+    {
+      "test_index": 78,
+      "actual_tier": 1,
+      "predicted_tier": 2,
+      "tier_step_error": 1,
+      "max_probability": 0.61,
+      "true_class_probability": 0.31,
+      "probabilities": [
+        0.02,
+        0.31,
+        0.61,
+        0.06
+      ],
+      "selected_specs": {
+        "battery_power": 560.0,
+        "mobile_wt": 146.0,
+        "px_height": 356.0,
+        "px_width": 1903.0,
+        "ram": 2360.0
+      }
+    },
+    {
+      "test_index": 85,
+      "actual_tier": 1,
+      "predicted_tier": 2,
+      "tier_step_error": 1,
+      "max_probability": 0.49,
+      "true_class_probability": 0.42,
+      "probabilities": [
+        0.02,
+        0.42,
+        0.49,
+        0.07
+      ],
+      "selected_specs": {
+        "battery_power": 531.0,
+        "mobile_wt": 121.0,
+        "px_height": 158.0,
+        "px_width": 1657.0,
+        "ram": 2331.0
+      }
+    },
+    {
+      "test_index": 89,
+      "actual_tier": 0,
+      "predicted_tier": 1,
+      "tier_step_error": 1,
+      "max_probability": 0.55,
+      "true_class_probability": 0.43,
+      "probabilities": [
+        0.43,
+        0.55,
+        0.02,
+        0.0
+      ],
+      "selected_specs": {
+        "battery_power": 590.0,
+        "mobile_wt": 141.0,
+        "px_height": 227.0,
+        "px_width": 509.0,
+        "ram": 1817.0
+      }
+    },
+    {
+      "test_index": 133,
+      "actual_tier": 1,
+      "predicted_tier": 2,
+      "tier_step_error": 1,
+      "max_probability": 0.54,
+      "true_class_probability": 0.46,
+      "probabilities": [
+        0.0,
+        0.46,
+        0.54,
+        0.0
+      ],
+      "selected_specs": {
+        "battery_power": 520.0,
+        "mobile_wt": 145.0,
+        "px_height": 264.0,
+        "px_width": 519.0,
+        "ram": 2753.0
+      }
+    },
+    {
+      "test_index": 136,
+      "actual_tier": 1,
+      "predicted_tier": 2,
+      "tier_step_error": 1,
+      "max_probability": 0.52,
+      "true_class_probability": 0.45,
+      "probabilities": [
+        0.01,
+        0.45,
+        0.52,
+        0.02
+      ],
+      "selected_specs": {
+        "battery_power": 1423.0,
+        "mobile_wt": 131.0,
+        "px_height": 501.0,
+        "px_width": 640.0,
+        "ram": 2253.0
+      }
+    },
+    {
+      "test_index": 149,
+      "actual_tier": 1,
+      "predicted_tier": 0,
+      "tier_step_error": 1,
+      "max_probability": 0.51,
+      "true_class_probability": 0.48,
+      "probabilities": [
+        0.51,
+        0.48,
+        0.01,
+        0.0
+      ],
+      "selected_specs": {
+        "battery_power": 1279.0,
+        "mobile_wt": 105.0,
+        "px_height": 560.0,
+        "px_width": 1633.0,
+        "ram": 1150.0
+      }
+    },
+    {
+      "test_index": 157,
+      "actual_tier": 3,
+      "predicted_tier": 2,
+      "tier_step_error": 1,
+      "max_probability": 0.81,
+      "true_class_probability": 0.15,
+      "probabilities": [
+        0.02,
+        0.02,
+        0.81,
+        0.15
+      ],
+      "selected_specs": {
+        "battery_power": 720.0,
+        "mobile_wt": 96.0,
+        "px_height": 1347.0,
+        "px_width": 1733.0,
+        "ram": 2799.0
+      }
+    },
+    {
+      "test_index": 161,
+      "actual_tier": 1,
+      "predicted_tier": 0,
+      "tier_step_error": 1,
+      "max_probability": 0.61,
+      "true_class_probability": 0.37,
+      "probabilities": [
+        0.61,
+        0.37,
+        0.02,
+        0.0
+      ],
+      "selected_specs": {
+        "battery_power": 1331.0,
+        "mobile_wt": 165.0,
+        "px_height": 1109.0,
+        "px_width": 1226.0,
+        "ram": 1026.0
+      }
+    },
+    {
+      "test_index": 166,
+      "actual_tier": 3,
+      "predicted_tier": 2,
+      "tier_step_error": 1,
+      "max_probability": 0.64,
+      "true_class_probability": 0.35,
+      "probabilities": [
+        0.0,
+        0.01,
+        0.64,
+        0.35
+      ],
+      "selected_specs": {
+        "battery_power": 959.0,
+        "mobile_wt": 196.0,
+        "px_height": 1313.0,
+        "px_width": 1331.0,
+        "ram": 3073.0
+      }
+    },
+    {
+      "test_index": 167,
+      "actual_tier": 2,
+      "predicted_tier": 1,
+      "tier_step_error": 1,
+      "max_probability": 0.71,
+      "true_class_probability": 0.27,
+      "probabilities": [
+        0.01,
+        0.71,
+        0.27,
+        0.01
+      ],
+      "selected_specs": {
+        "battery_power": 1893.0,
+        "mobile_wt": 179.0,
+        "px_height": 1203.0,
+        "px_width": 1432.0,
+        "ram": 1482.0
+      }
+    },
+    {
+      "test_index": 203,
+      "actual_tier": 2,
+      "predicted_tier": 3,
+      "tier_step_error": 1,
+      "max_probability": 0.67,
+      "true_class_probability": 0.31,
+      "probabilities": [
+        0.01,
+        0.01,
+        0.31,
+        0.67
+      ],
+      "selected_specs": {
+        "battery_power": 1315.0,
+        "mobile_wt": 128.0,
+        "px_height": 59.0,
+        "px_width": 575.0,
+        "ram": 3278.0
+      }
+    },
+    {
+      "test_index": 209,
+      "actual_tier": 2,
+      "predicted_tier": 1,
+      "tier_step_error": 1,
+      "max_probability": 0.81,
+      "true_class_probability": 0.18,
+      "probabilities": [
+        0.0,
+        0.81,
+        0.18,
+        0.01
+      ],
+      "selected_specs": {
+        "battery_power": 1159.0,
+        "mobile_wt": 104.0,
+        "px_height": 717.0,
+        "px_width": 1206.0,
+        "ram": 2115.0
+      }
+    },
+    {
+      "test_index": 211,
+      "actual_tier": 3,
+      "predicted_tier": 2,
+      "tier_step_error": 1,
+      "max_probability": 0.56,
+      "true_class_probability": 0.4,
+      "probabilities": [
+        0.02,
+        0.02,
+        0.56,
+        0.4
+      ],
+      "selected_specs": {
+        "battery_power": 1188.0,
+        "mobile_wt": 114.0,
+        "px_height": 1339.0,
+        "px_width": 1558.0,
+        "ram": 2896.0
+      }
+    },
+    {
+      "test_index": 228,
+      "actual_tier": 1,
+      "predicted_tier": 0,
+      "tier_step_error": 1,
+      "max_probability": 0.48,
+      "true_class_probability": 0.48,
+      "probabilities": [
+        0.48,
+        0.48,
+        0.04,
+        0.0
+      ],
+      "selected_specs": {
+        "battery_power": 1702.0,
+        "mobile_wt": 107.0,
+        "px_height": 1284.0,
+        "px_width": 1643.0,
+        "ram": 595.0
+      }
+    },
+    {
+      "test_index": 239,
+      "actual_tier": 2,
+      "predicted_tier": 3,
+      "tier_step_error": 1,
+      "max_probability": 0.5,
+      "true_class_probability": 0.46,
+      "probabilities": [
+        0.01,
+        0.03,
+        0.46,
+        0.5
+      ],
+      "selected_specs": {
+        "battery_power": 1589.0,
+        "mobile_wt": 195.0,
+        "px_height": 810.0,
+        "px_width": 1743.0,
+        "ram": 2612.0
+      }
+    },
+    {
+      "test_index": 246,
+      "actual_tier": 3,
+      "predicted_tier": 2,
+      "tier_step_error": 1,
+      "max_probability": 0.6,
+      "true_class_probability": 0.39,
+      "probabilities": [
+        0.0,
+        0.01,
+        0.6,
+        0.39
+      ],
+      "selected_specs": {
+        "battery_power": 1590.0,
+        "mobile_wt": 187.0,
+        "px_height": 1058.0,
+        "px_width": 1109.0,
+        "ram": 2836.0
+      }
+    },
+    {
+      "test_index": 270,
+      "actual_tier": 3,
+      "predicted_tier": 2,
+      "tier_step_error": 1,
+      "max_probability": 0.49,
+      "true_class_probability": 0.46,
+      "probabilities": [
+        0.01,
+        0.04,
+        0.49,
+        0.46
+      ],
+      "selected_specs": {
+        "battery_power": 1961.0,
+        "mobile_wt": 100.0,
+        "px_height": 861.0,
+        "px_width": 1888.0,
+        "ram": 2355.0
+      }
+    },
+    {
+      "test_index": 283,
+      "actual_tier": 1,
+      "predicted_tier": 2,
+      "tier_step_error": 1,
+      "max_probability": 0.71,
+      "true_class_probability": 0.25,
+      "probabilities": [
+        0.03,
+        0.25,
+        0.71,
+        0.01
+      ],
+      "selected_specs": {
+        "battery_power": 709.0,
+        "mobile_wt": 136.0,
+        "px_height": 1545.0,
+        "px_width": 1596.0,
+        "ram": 1973.0
+      }
+    },
+    {
+      "test_index": 312,
+      "actual_tier": 2,
+      "predicted_tier": 1,
+      "tier_step_error": 1,
+      "max_probability": 0.52,
+      "true_class_probability": 0.45,
+      "probabilities": [
+        0.01,
+        0.52,
+        0.45,
+        0.02
+      ],
+      "selected_specs": {
+        "battery_power": 1260.0,
+        "mobile_wt": 123.0,
+        "px_height": 905.0,
+        "px_width": 1313.0,
+        "ram": 2208.0
+      }
+    },
+    {
+      "test_index": 330,
+      "actual_tier": 1,
+      "predicted_tier": 0,
+      "tier_step_error": 1,
+      "max_probability": 0.57,
+      "true_class_probability": 0.41,
+      "probabilities": [
+        0.57,
+        0.41,
+        0.0,
+        0.02
+      ],
+      "selected_specs": {
+        "battery_power": 1902.0,
+        "mobile_wt": 155.0,
+        "px_height": 766.0,
+        "px_width": 877.0,
+        "ram": 940.0
+      }
+    },
+    {
+      "test_index": 340,
+      "actual_tier": 2,
+      "predicted_tier": 1,
+      "tier_step_error": 1,
+      "max_probability": 0.66,
+      "true_class_probability": 0.29,
+      "probabilities": [
+        0.03,
+        0.66,
+        0.29,
+        0.02
+      ],
+      "selected_specs": {
+        "battery_power": 946.0,
+        "mobile_wt": 143.0,
+        "px_height": 650.0,
+        "px_width": 1740.0,
+        "ram": 2177.0
+      }
+    },
+    {
+      "test_index": 353,
+      "actual_tier": 2,
+      "predicted_tier": 3,
+      "tier_step_error": 1,
+      "max_probability": 0.66,
+      "true_class_probability": 0.33,
+      "probabilities": [
+        0.0,
+        0.01,
+        0.33,
+        0.66
+      ],
+      "selected_specs": {
+        "battery_power": 1517.0,
+        "mobile_wt": 169.0,
+        "px_height": 570.0,
+        "px_width": 1645.0,
+        "ram": 2738.0
+      }
+    },
+    {
+      "test_index": 399,
+      "actual_tier": 1,
+      "predicted_tier": 2,
+      "tier_step_error": 1,
+      "max_probability": 0.71,
+      "true_class_probability": 0.27,
+      "probabilities": [
+        0.0,
+        0.27,
+        0.71,
+        0.02
+      ],
+      "selected_specs": {
+        "battery_power": 696.0,
+        "mobile_wt": 197.0,
+        "px_height": 649.0,
+        "px_width": 907.0,
+        "ram": 2630.0
+      }
+    }
+  ],
+  "out_of_distribution_analysis": [
+    {
+      "row_index": 0,
+      "edge_case_type": "max_ram_min_everything_else",
+      "selected_specs": {
+        "battery_power": 500.0,
+        "mobile_wt": 80.0,
+        "px_height": 0.0,
+        "px_width": 500.0,
+        "ram": 3998.0
+      },
+      "predicted_tier": 3,
+      "tier_label": "High",
+      "probabilities": [
+        0.03,
+        0.07,
+        0.37,
+        0.53
+      ],
+      "max_confidence": 0.53,
+      "shannon_entropy": 0.9957,
+      "top_shap_attributions": [
+        {
+          "feature": "ram",
+          "feature_value": 3998.0,
+          "shap_value": 0.5419
+        },
+        {
+          "feature": "battery_power",
+          "feature_value": 500.0,
+          "shap_value": -0.1574
+        },
+        {
+          "feature": "px_height",
+          "feature_value": 0.0,
+          "shap_value": -0.066
+        },
+        {
+          "feature": "px_width",
+          "feature_value": 500.0,
+          "shap_value": -0.0548
+        },
+        {
+          "feature": "mobile_wt",
+          "feature_value": 80.0,
+          "shap_value": 0.0187
+        }
+      ]
+    },
+    {
+      "row_index": 1,
+      "edge_case_type": "min_ram_max_everything_else",
+      "selected_specs": {
+        "battery_power": 2000.0,
+        "mobile_wt": 200.0,
+        "px_height": 1960.0,
+        "px_width": 1998.0,
+        "ram": 256.0
+      },
+      "predicted_tier": 0,
+      "tier_label": "Low",
+      "probabilities": [
+        0.4,
+        0.4,
+        0.19,
+        0.01
+      ],
+      "max_confidence": 0.4,
+      "shannon_entropy": 1.0946,
+      "top_shap_attributions": [
+        {
+          "feature": "ram",
+          "feature_value": 256.0,
+          "shap_value": 0.4983
+        },
+        {
+          "feature": "battery_power",
+          "feature_value": 2000.0,
+          "shap_value": -0.1434
+        },
+        {
+          "feature": "px_height",
+          "feature_value": 1960.0,
+          "shap_value": -0.1216
+        },
+        {
+          "feature": "px_width",
+          "feature_value": 1998.0,
+          "shap_value": -0.0829
+        },
+        {
+          "feature": "mobile_wt",
+          "feature_value": 200.0,
+          "shap_value": -0.0008
+        }
+      ]
+    },
+    {
+      "row_index": 2,
+      "edge_case_type": "high_battery_zero_resolution",
+      "selected_specs": {
+        "battery_power": 2000.0,
+        "mobile_wt": 140.0,
+        "px_height": 0.0,
+        "px_width": 500.0,
+        "ram": 2127.0
+      },
+      "predicted_tier": 1,
+      "tier_label": "Mid",
+      "probabilities": [
+        0.06,
+        0.59,
+        0.29,
+        0.06
+      ],
+      "max_confidence": 0.59,
+      "shannon_entropy": 1.0079,
+      "top_shap_attributions": [
+        {
+          "feature": "ram",
+          "feature_value": 2127.0,
+          "shap_value": 0.2664
+        },
+        {
+          "feature": "battery_power",
+          "feature_value": 2000.0,
+          "shap_value": -0.087
+        },
+        {
+          "feature": "px_width",
+          "feature_value": 500.0,
+          "shap_value": 0.0789
+        },
+        {
+          "feature": "px_height",
+          "feature_value": 0.0,
+          "shap_value": 0.068
+        },
+        {
+          "feature": "mobile_wt",
+          "feature_value": 140.0,
+          "shap_value": 0.0129
+        }
+      ]
+    }
+  ],
+  "boundary_valid_summary": {
+    "n_rows": 40,
+    "tier_distribution": {
+      "Tier 0 (Low)": 1,
+      "Tier 1 (Mid)": 34,
+      "Tier 2 (Mid-High)": 4,
+      "Tier 3 (High)": 1
+    },
+    "mean_confidence": 0.6155,
+    "min_confidence": 0.5,
+    "max_confidence": 0.96
+  }
+}
