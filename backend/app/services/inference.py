@@ -1,8 +1,7 @@
 """
 Model loading and preprocessing pipeline for price-range inference.
 
-Pipeline logic aligned with notebooks/eda_and_baseline.ipynb.
-Prediction endpoints (/predict, /whatif) are intentionally not implemented yet.
+Pipeline logic aligned with notebooks/eda_and_baseline.ipynb and scripts/train_tuned.py.
 """
 
 from __future__ import annotations
@@ -43,7 +42,6 @@ FEATURE_COLUMNS: list[str] = [
 
 TARGET_COLUMN = "price_range"
 SOURCE_COLUMN = "source"
-TRAIN_SOURCE_VALUE = "synthetic_train"
 RANDOM_STATE = 42
 
 # Default and tuned artifact locations
@@ -94,10 +92,7 @@ def default_cleaned_csv_path() -> Path:
 
 
 def default_merged_csv_path() -> Path:
-    preferred = _REPO_ROOT / "data" / "raw" / "merged_dataset.csv"
-    if preferred.exists():
-        return preferred
-    return _REPO_ROOT / "data" / "raw" / "merged_dataset_PLACEHOLDER.csv"
+    return _REPO_ROOT / "data" / "raw" / "merged_dataset.csv"
 
 
 def load_training_frame(csv_path: Path | None = None) -> pd.DataFrame:
@@ -105,7 +100,7 @@ def load_training_frame(csv_path: Path | None = None) -> pd.DataFrame:
     Load training frame for modeling.
 
     Prefers data/processed/train_cleaned.csv when available.
-    Supports merged_dataset.csv and merged_dataset_PLACEHOLDER.csv (filtering out fixtures).
+    Supports merged_dataset.csv (filtering out test fixtures).
     """
     if csv_path is None:
         cleaned_path = default_cleaned_csv_path()

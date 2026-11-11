@@ -45,6 +45,8 @@ from app.services.inference import (  # noqa: E402
 from app.services.shap_service import explain_prediction  # noqa: E402
 
 
+# pyrefly: ignore[bad-return]
+# pyrefly: ignore[bad-return, parse-error]
 def run_error_analysis() -> dict[str, Any]:
     # 1. Load dataset & reproduce exact 80/20 stratified hold-out split
     df = load_training_frame()

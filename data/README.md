@@ -24,9 +24,7 @@ data/
 ├── raw/
 │   ├── train.csv                  Real canonical Kaggle train set (2,000 rows)
 │   ├── test.csv                   Real canonical Kaggle test set (1,000 rows)
-│   ├── merged_dataset.csv         Real train set + test fixtures (2,043 rows)
-│   ├── train_PLACEHOLDER.csv      Original synthetic fallback
-│   └── merged_dataset_PLACEHOLDER.csv
+│   └── merged_dataset.csv         Real train set + test fixtures (2,043 rows)
 ├── processed/
 │   ├── train_cleaned.csv          Fully cleaned training set
 │   └── test_cleaned.csv           Cleaned test set (train-learned imputation)
