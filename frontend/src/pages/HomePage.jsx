@@ -160,7 +160,7 @@ export default function HomePage() {
               Model Card & Technical Validation
             </h3>
             <p className="mt-2 text-xs text-[var(--color-ink-soft)] leading-relaxed">
-              Complete documentation per PRD Chapter 13: 5-fold Stratified CV splits, confusion matrix on 400 hold-out test units, and RFECV elimination log.
+              Complete model governance documentation: 5-fold Stratified CV splits, confusion matrix on 400 hold-out test units, and RFECV elimination log.
             </p>
           </Link>
         </div>

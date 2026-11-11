@@ -206,7 +206,7 @@ export default function WhatIfSliders({
           className="mt-4 rounded-xl border border-amber-500/60 bg-amber-500/10 p-3.5 text-xs text-amber-700 dark:text-amber-300"
         >
           <div className="flex items-center gap-2 font-bold">
-            <span>⚠️ Extrapolated Specification Warning (PRD Ch. 15.3)</span>
+            <span>⚠️ Extrapolated Specification Warning</span>
           </div>
           <p className="mt-1 leading-relaxed">
             {extrapolatedList.map((c) => c.label).join(', ')}{' '}

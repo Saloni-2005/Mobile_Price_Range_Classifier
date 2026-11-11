@@ -69,7 +69,7 @@ export default function LoginPage() {
         <div>
           <div className="flex items-center gap-2">
             <span className="accent-label text-xs font-semibold tracking-wider uppercase">
-              Security · PRD Ch. 10.4
+              Security · Access Control
             </span>
             <span className="phase-chip text-[0.65rem]">
               {authState.isAuthenticated ? 'JWT Active' : 'Unauthenticated'}
@@ -183,7 +183,7 @@ export default function LoginPage() {
               </div>
 
               <div className="rounded-xl border border-[var(--color-line)] bg-[var(--color-field-bg)] p-3 text-xs text-[var(--color-ink-soft)] flex items-center justify-between">
-                <span>Seeded Demo Persona (PRD Ch. 10.4):</span>
+                <span>Seeded Demo Persona:</span>
                 <code className="font-mono font-bold text-[var(--color-ink)]">
                   analyst / pricing2026
                 </code>
@@ -283,7 +283,7 @@ export default function LoginPage() {
 
           <section className="panel rounded-2xl p-6 space-y-3">
             <h3 className="font-display text-base font-bold text-[var(--color-ink)]">
-              Endpoint Access Control Matrix (PRD Ch. 10.4)
+              Endpoint Access Control Matrix
             </h3>
             <div className="overflow-x-auto rounded-xl border border-[var(--color-line)]">
               <table className="w-full text-left text-xs">
@@ -329,3 +329,4 @@ export default function LoginPage() {
     </div>
   )
 }
+

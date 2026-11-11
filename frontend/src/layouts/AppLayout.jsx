@@ -182,8 +182,8 @@ export default function AppLayout() {
           </nav>
         </div>
 
-        {/* Footer Area: API Health + Theme Toggle */}
-        <div className="w-72 p-4 border-t border-[var(--color-line)] space-y-3">
+        {/* Footer Area: API Health */}
+        <div className="w-72 p-4 border-t border-[var(--color-line)]">
           <div className="flex items-center justify-between text-xs">
             <span className="text-[var(--color-ink-soft)] text-[0.7rem]">Backend Status:</span>
             <span className="flex items-center gap-1.5 font-medium text-[0.7rem]">
@@ -198,10 +198,6 @@ export default function AppLayout() {
               />
               {apiOnline === true ? 'Online (8000)' : apiOnline === false ? 'Offline' : 'Connecting...'}
             </span>
-          </div>
-          <div className="flex items-center justify-between pt-2 border-t border-[var(--color-line)]">
-            <span className="text-[0.7rem] text-[var(--color-ink-soft)]">Theme:</span>
-            <ThemeToggle />
           </div>
         </div>
       </aside>

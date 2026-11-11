@@ -5,7 +5,7 @@ export default function ModelCardPage() {
       <div className="border-b border-[var(--color-line)] pb-4">
         <div className="flex items-center gap-2">
           <span className="accent-label text-xs font-semibold tracking-wider uppercase">Governance</span>
-          <span className="phase-chip text-[0.65rem]">PRD Chapter 13</span>
+          <span className="phase-chip text-[0.65rem]">Model Audit</span>
         </div>
         <h1 className="font-display text-3xl font-extrabold mt-1 text-[var(--color-ink)]">
           Model Card — Mobile Price-Range Classifier
@@ -17,7 +17,7 @@ export default function ModelCardPage() {
 
       {/* Benchmark Summary Table */}
       <section className="panel p-6 rounded-2xl border border-[var(--color-line)] space-y-4">
-        <h2 className="font-display text-xl font-bold">Performance vs Targets (PRD Ch. 3)</h2>
+        <h2 className="font-display text-xl font-bold">Performance vs Committed Targets</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
             <thead>

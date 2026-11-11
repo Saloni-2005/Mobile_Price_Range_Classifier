@@ -17,7 +17,7 @@ from typing import Any
 ILLUSTRATIVE_CAVEAT: str = (
     "Illustrative cost/margin model — transparent linear approximation for "
     "demonstrating specification trade-offs only, not real vendor bill-of-materials "
-    "(BOM) data (PRD Ch. 5.3 / Ch. 13)."
+    "(BOM) data."
 )
 
 # Typical retail price midpoints (USD) for each of the 4 target price tiers

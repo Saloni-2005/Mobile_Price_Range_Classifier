@@ -209,7 +209,7 @@ export default function MarginImpactPanel({
             <div className="flex items-center justify-between font-bold text-[var(--color-ink)]">
               <span>Illustrative Economic Breakdown (Synthetic Linear Proxy)</span>
               <span className="text-[0.65rem] uppercase tracking-wider text-amber-600">
-                PRD Ch. 5.3 / 13
+                Linear Proxy
               </span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
@@ -262,7 +262,7 @@ export default function MarginImpactPanel({
         className="caveat mt-5 rounded-xl border border-amber-500/40 bg-amber-500/10 p-3.5 text-xs leading-relaxed"
       >
         <strong className="uppercase tracking-wider text-[0.68rem] block mb-0.5">
-          ⚠️ Illustrative Cost Model Caveat (Always Visible — PRD Ch. 5.3 &amp; Ch. 13)
+          ⚠️ Illustrative Cost Model Caveat
         </strong>
         {whatIfResult?.caveat ||
           'Illustrative cost model — not real vendor BOM data. Margin figures combine predicted tier price midpoints ($125 / $225 / $400 / $650) with a transparent linear hardware cost approximation for directional trade-off exploration only.'}

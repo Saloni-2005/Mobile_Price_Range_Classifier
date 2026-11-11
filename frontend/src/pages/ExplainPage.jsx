@@ -82,7 +82,7 @@ export default function ExplainPage() {
               Mathematical Additivity
             </h3>
             <p className="text-xs text-[var(--color-ink-soft)] leading-relaxed">
-              Per PRD Chapter 14.1, TreeSHAP satisfies the additivity property:
+              TreeSHAP guarantees the exact mathematical additivity property:
             </p>
             <div className="font-mono text-[0.7rem] p-2 rounded bg-[var(--color-field-bg)] border border-[var(--color-line)]">
               sum(attributions) + base_value = raw_output
