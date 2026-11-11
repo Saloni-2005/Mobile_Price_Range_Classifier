@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PredictionForm from '../components/PredictionForm'
-import ShapWaterfall from '../components/ShapWaterfall'
 
 export default function PredictPage() {
   const [latestPrediction, setLatestPrediction] = useState(null)
@@ -98,13 +97,6 @@ export default function PredictPage() {
           </div>
         </div>
       </div>
-
-      {/* Live TreeSHAP Waterfall shown immediately after a prediction is made */}
-      {latestPrediction && (
-        <div className="animate-rise">
-          <ShapWaterfall predictionId={latestPrediction.prediction_id} />
-        </div>
-      )}
     </div>
   )
 }
