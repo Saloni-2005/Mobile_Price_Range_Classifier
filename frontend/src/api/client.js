@@ -20,6 +20,11 @@ export async function getFeatureImportance() {
   return response.data
 }
 
+export async function getExplanation(predictionId) {
+  const response = await apiClient.get(`/explain/${predictionId}`)
+  return response.data
+}
+
 export async function checkHealth() {
   const response = await apiClient.get('/health')
   return response.data
