@@ -102,6 +102,7 @@ def run_error_analysis() -> dict[str, Any]:
 
     # Collect detailed misclassified examples
     misclassified_samples: list[dict[str, Any]] = []
+    # pyrefly: ignore[bad-argument-type, not-iterable]
     error_indices = [int(i) for i in np.flatnonzero(error_mask).tolist()]
     for idx in error_indices:
         row_series = X_test_df.iloc[idx]
