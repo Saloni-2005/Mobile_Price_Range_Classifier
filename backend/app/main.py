@@ -6,6 +6,7 @@ Registers routers and loads the model artifact at startup when available.
 
 from contextlib import asynccontextmanager
 import os
+from typing import Any, cast
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -43,7 +44,8 @@ _cors_origins = (
 )
 
 app.add_middleware(
-    CORSMiddleware,
+    cast(Any, CORSMiddleware),
+    # pyrefly: ignore[bad-keyword-argument]
     allow_origins=_cors_origins,
     allow_credentials=_cors_origins != ["*"],
     allow_methods=["*"],
