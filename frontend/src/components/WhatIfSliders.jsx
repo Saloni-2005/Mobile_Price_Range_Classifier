@@ -1,9 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 
-/**
- * RFE-selected numeric features with observed training bounds (PRD Ch. 12 / 15.3)
- * and extended slider bounds to allow testing extrapolation behavior.
- */
 const RFE_SLIDER_CONFIG = [
   {
     name: 'ram',
@@ -67,10 +63,13 @@ const RFE_SLIDER_CONFIG = [
   },
 ]
 
-/**
- * WhatIfSliders — Interactive RFE-selected specification playground (PRD Ch. 5.2, 7.2, 15.3).
- * Debounces slider adjustments (~300ms) and flags extrapolated values outside training bounds.
- */
+function buildTrackGradient(cfg) {
+  const span = cfg.sliderMax - cfg.sliderMin
+  const startPct = Math.max(0, ((cfg.trainMin - cfg.sliderMin) / span) * 100)
+  const endPct = Math.min(100, ((cfg.trainMax - cfg.sliderMin) / span) * 100)
+  return `linear-gradient(90deg, var(--color-warn-border) 0%, var(--color-warn-border) ${startPct.toFixed(1)}%, var(--color-accent-border) ${startPct.toFixed(1)}%, var(--color-accent-border) ${endPct.toFixed(1)}%, var(--color-warn-border) ${endPct.toFixed(1)}%, var(--color-warn-border) 100%)`
+}
+
 export default function WhatIfSliders({
   baselineSpecs,
   baselinePredictionId,
@@ -141,19 +140,13 @@ export default function WhatIfSliders({
 
   return (
     <section className="panel h-full rounded-2xl p-5 md:p-6" id="whatif-sliders-panel">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-3 pb-4 border-b border-[var(--color-line)]">
         <div>
-          <div className="flex items-center gap-2">
-            <p className="accent-label text-[0.7rem] font-semibold tracking-[0.14em] uppercase">
-              Module 04
-            </p>
-            <span className="phase-chip text-[0.65rem]">5 RFECV Drivers</span>
-          </div>
-          <h2 className="font-display mt-1 text-xl font-bold">
-            What-If Specification Sliders
+          <h2 className="font-display text-lg font-bold text-[var(--color-ink)]">
+            Hardware Driver Controls
           </h2>
-          <p className="mt-1 text-sm text-[var(--color-ink-soft)]">
-            Adjust the 5 RFECV-selected hardware drivers (debounced 300ms) to simulate price-tier and BOM margin shifts.
+          <p className="mt-0.5 text-xs text-[var(--color-ink-soft)]">
+            Adjust the 5 RFECV drivers (300ms debounce). Indigo band = in-domain training range; amber ends = extrapolation.
           </p>
         </div>
 
@@ -161,22 +154,22 @@ export default function WhatIfSliders({
           type="button"
           onClick={handleReset}
           disabled={!baselinePredictionId || simulating}
-          className="text-xs px-3 py-1.5 rounded-lg border border-[var(--color-line)] text-[var(--color-ink-soft)] hover:text-[var(--color-ink)] hover:border-[var(--color-accent)] transition-all cursor-pointer disabled:opacity-50"
+          className="text-xs px-3 py-1.5 rounded-lg border border-[var(--color-line-strong)] bg-[var(--color-surface-subtle)] text-[var(--color-ink-soft)] hover:text-[var(--color-ink)] hover:border-[var(--color-accent-border)] transition-colors cursor-pointer disabled:opacity-50"
         >
-          Reset to Baseline
+          Reset Baseline
         </button>
       </div>
 
       {/* Quick trade-off scenario presets */}
-      <div className="mt-4 flex flex-wrap items-center gap-2 border-b border-[var(--color-line)] pb-3">
-        <span className="text-[0.7rem] font-semibold uppercase tracking-wider text-[var(--color-ink-soft)]">
-          Quick Scenarios:
+      <div className="mt-4 flex flex-wrap items-center gap-2 pb-3 border-b border-[var(--color-line)]">
+        <span className="text-[0.68rem] font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
+          Scenarios:
         </span>
         <button
           type="button"
           onClick={() => applyPreset({ ram: 3600, battery_power: 1850 })}
           disabled={!baselinePredictionId}
-          className="text-xs px-2.5 py-1 rounded-md border border-[var(--color-line)] bg-[var(--color-field-bg)] hover:border-[var(--color-accent)] cursor-pointer transition-all"
+          className="text-xs px-2.5 py-1 rounded-lg border border-[var(--color-line-strong)] bg-[var(--color-surface-subtle)] text-[var(--color-ink-soft)] hover:text-[var(--color-ink)] hover:border-[var(--color-accent-border)] cursor-pointer transition-colors"
         >
           Flagship RAM + Battery
         </button>
@@ -184,7 +177,7 @@ export default function WhatIfSliders({
           type="button"
           onClick={() => applyPreset({ ram: 1024, px_width: 800, px_height: 480 })}
           disabled={!baselinePredictionId}
-          className="text-xs px-2.5 py-1 rounded-md border border-[var(--color-line)] bg-[var(--color-field-bg)] hover:border-[var(--color-accent)] cursor-pointer transition-all"
+          className="text-xs px-2.5 py-1 rounded-lg border border-[var(--color-line-strong)] bg-[var(--color-surface-subtle)] text-[var(--color-ink-soft)] hover:text-[var(--color-ink)] hover:border-[var(--color-accent-border)] cursor-pointer transition-colors"
         >
           Budget Downscale
         </button>
@@ -192,32 +185,31 @@ export default function WhatIfSliders({
           type="button"
           onClick={() => applyPreset({ ram: 4800, battery_power: 2400 })}
           disabled={!baselinePredictionId}
-          className="text-xs px-2.5 py-1 rounded-md border border-amber-500/40 bg-amber-500/10 text-amber-600 hover:border-amber-500 cursor-pointer transition-all"
+          className="text-xs px-2.5 py-1 rounded-lg border border-[var(--color-warn-border)] bg-[var(--color-warn-bg)] text-warn hover:brightness-105 cursor-pointer transition-all font-medium"
         >
           Test Extrapolation (4800 MB)
         </button>
       </div>
 
-      {/* Extrapolation warning banner (PRD Chapter 15.3) */}
+      {/* Extrapolation warning banner */}
       {extrapolatedList.length > 0 && (
         <div
           role="alert"
           data-testid="extrapolation-warning"
-          className="mt-4 rounded-xl border border-amber-500/60 bg-amber-500/10 p-3.5 text-xs text-amber-700 dark:text-amber-300"
+          className="mt-4 rounded-xl border border-[var(--color-warn-border)] bg-[var(--color-warn-bg)] p-3.5 text-xs text-warn"
         >
-          <div className="flex items-center gap-2 font-bold">
-            <span>⚠️ Extrapolated Specification Warning</span>
-          </div>
-          <p className="mt-1 leading-relaxed">
-            {extrapolatedList.map((c) => c.label).join(', ')}{' '}
-            {extrapolatedList.length === 1 ? 'is' : 'are'} outside the training dataset&apos;s observed range.
-            Random Forest trees cannot extrapolate linear trends beyond their leaf split thresholds — treat resulting probabilities with caution.
+          <div className="font-bold">Extrapolated Specification Warning</div>
+          <p className="mt-1 leading-relaxed text-[var(--color-ink-soft)]">
+            <strong className="text-[var(--color-ink)]">
+              {extrapolatedList.map((c) => c.label).join(', ')}
+            </strong>{' '}
+            {extrapolatedList.length === 1 ? 'is' : 'are'} outside the training dataset&apos;s observed range. Random Forest leaves cannot extrapolate linear trends beyond split thresholds.
           </p>
         </div>
       )}
 
       {/* Sliders list */}
-      <div className="mt-5 space-y-5">
+      <div className="mt-4 space-y-3.5">
         {RFE_SLIDER_CONFIG.map((cfg) => {
           const currentVal = values[cfg.name] ?? cfg.defaultValue
           const baseVal =
@@ -231,42 +223,42 @@ export default function WhatIfSliders({
           return (
             <div
               key={cfg.name}
-              className={`rounded-xl border p-3.5 transition-all ${
+              className={`rounded-xl border p-3.5 transition-colors ${
                 isExtrapolated
-                  ? 'border-amber-500/70 bg-amber-500/5'
+                  ? 'border-[var(--color-warn-border)] bg-[var(--color-warn-bg)]'
                   : delta !== 0
-                  ? 'border-[var(--color-accent)]/50 bg-[var(--color-field-bg)]'
-                  : 'border-[var(--color-line)] bg-[var(--color-field-bg)]/60'
+                  ? 'border-[var(--color-accent-border)] bg-[var(--color-accent-soft)]'
+                  : 'border-[var(--color-line)] bg-[var(--color-surface-subtle)]'
               }`}
             >
-              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
                 <div className="flex items-center gap-2">
                   <label
                     htmlFor={`slider-${cfg.name}`}
-                    className="text-sm font-semibold text-[var(--color-ink)]"
+                    className="text-xs font-semibold text-[var(--color-ink)]"
                   >
                     {cfg.label}
                   </label>
-                  <code className="text-[0.68rem] text-[var(--color-ink-soft)]">
-                    ({cfg.name})
+                  <code className="text-[0.66rem] font-mono text-[var(--color-ink-muted)]">
+                    {cfg.name}
                   </code>
                   {isExtrapolated && (
-                    <span className="px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase bg-amber-500 text-white">
-                      Extrapolated
+                    <span className="px-1.5 py-0.5 rounded text-[0.6rem] font-bold uppercase border border-[var(--color-warn-border)] bg-[var(--color-warn-bg)] text-warn">
+                      OOD
                     </span>
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 font-mono text-xs">
+                <div className="flex items-center gap-2 font-mono text-xs tabular-nums">
                   <span className="font-bold text-[var(--color-ink)]">
                     {currentVal} {cfg.unit}
                   </span>
                   {delta !== 0 && (
                     <span
-                      className={`px-1.5 py-0.5 rounded text-[0.68rem] font-semibold ${
+                      className={`px-1.5 py-0.5 rounded text-[0.66rem] font-semibold ${
                         delta > 0
-                          ? 'bg-emerald-500/15 text-emerald-600'
-                          : 'bg-amber-500/15 text-amber-600'
+                          ? 'bg-[var(--color-pos-bg)] text-pos'
+                          : 'bg-[var(--color-warn-bg)] text-warn'
                       }`}
                     >
                       {delta > 0 ? `+${delta}` : delta} {cfg.unit}
@@ -277,7 +269,8 @@ export default function WhatIfSliders({
 
               <input
                 id={`slider-${cfg.name}`}
-                className="slider-track w-full"
+                className={`slider-track w-full ${isExtrapolated ? 'slider-track--warn' : ''}`}
+                style={{ background: buildTrackGradient(cfg) }}
                 type="range"
                 min={cfg.sliderMin}
                 max={cfg.sliderMax}
@@ -287,15 +280,15 @@ export default function WhatIfSliders({
                 onChange={(e) => handleSliderChange(cfg.name, e.target.value)}
               />
 
-              <div className="mt-1.5 flex flex-wrap items-center justify-between text-[0.68rem] text-[var(--color-ink-soft)]">
+              <div className="mt-2 flex flex-wrap items-center justify-between text-[0.66rem] text-[var(--color-ink-muted)] tabular-nums">
                 <span>
-                  Training range:{' '}
-                  <strong className="text-[var(--color-ink)]">
+                  Safe range:{' '}
+                  <strong className="font-mono text-[var(--color-ink-soft)]">
                     {cfg.trainMin}–{cfg.trainMax} {cfg.unit}
                   </strong>
                 </span>
                 <span>
-                  Baseline: <span className="font-mono">{baseVal} {cfg.unit}</span> • Illustrative BOM rate: {cfg.costRate}
+                  Base <span className="font-mono">{baseVal}</span> · Proxy {cfg.costRate}
                 </span>
               </div>
             </div>

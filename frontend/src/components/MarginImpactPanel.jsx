@@ -1,15 +1,5 @@
 const TIER_NAMES = ['Low', 'Mid', 'Mid-High', 'High']
-const TIER_BADGES = [
-  'bg-sky-500/15 text-sky-600 border-sky-500/30',
-  'bg-emerald-500/15 text-emerald-600 border-emerald-500/30',
-  'bg-amber-500/15 text-amber-600 border-amber-500/30',
-  'bg-purple-500/15 text-purple-600 border-purple-500/30',
-]
 
-/**
- * MarginImpactPanel — shows live POST /whatif result: new tier, probability shift,
- * and illustrative margin delta (PRD Ch. 7.2 / Ch. 5.3 / Ch. 15.3).
- */
 export default function MarginImpactPanel({
   whatIfResult,
   baselinePrediction,
@@ -59,102 +49,114 @@ export default function MarginImpactPanel({
   }
 
   return (
-    <section className="panel h-full rounded-2xl p-5 md:p-6 flex flex-col justify-between" id="margin-impact-panel">
+    <section
+      className="panel h-full rounded-2xl p-5 md:p-6 flex flex-col justify-between"
+      id="margin-impact-panel"
+    >
       <div>
-        <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex flex-wrap items-start justify-between gap-3 pb-4 border-b border-[var(--color-line)]">
           <div>
-            <div className="flex items-center gap-2">
-              <p className="accent-label text-[0.7rem] font-semibold tracking-[0.14em] uppercase">
-                Module 05
-              </p>
-              <span className="phase-chip text-[0.65rem]">
-                {loading ? 'Recomputing...' : whatIfResult ? `Sim #${whatIfResult.simulation_id}` : 'Baseline State'}
-              </span>
-            </div>
-            <h2 className="font-display mt-1 text-xl font-bold">
+            <h2 className="font-display text-lg font-bold text-[var(--color-ink)]">
               Margin &amp; Tier Impact
             </h2>
-            <p className="mt-1 max-w-xl text-sm text-[var(--color-ink-soft)]">
-              Live response from <code className="font-mono text-xs">POST /whatif</code>: resulting price tier, class probability shifts, and illustrative margin delta.
+            <p className="mt-0.5 text-xs text-[var(--color-ink-soft)]">
+              Live response from <code className="font-mono">POST /whatif</code> showing tier shifts and illustrative BOM economics.
             </p>
           </div>
+          <span className="phase-chip text-[0.64rem]">
+            {loading
+              ? 'Recomputing...'
+              : whatIfResult
+              ? `Sim #${whatIfResult.simulation_id}`
+              : 'Baseline'}
+          </span>
         </div>
 
         {error && (
-          <div className="mt-4 rounded-xl border border-red-500/40 bg-red-500/10 p-3 text-xs text-red-600">
+          <div className="mt-4 rounded-xl border border-[var(--color-neg-border)] bg-[var(--color-neg-bg)] p-3 text-xs text-neg">
             <strong>Simulation error:</strong> {error}
           </div>
         )}
 
         {/* Top 3 Primary Metric Tiles */}
-        <div className="mt-5 grid gap-4 sm:grid-cols-3">
+        <div className="mt-5 grid gap-3.5 sm:grid-cols-3">
           <div className="metric-tile">
-            <p className="text-[0.7rem] tracking-wide text-[var(--color-ink-soft)] uppercase">
+            <p className="text-[0.66rem] font-semibold tracking-wider text-[var(--color-ink-muted)] uppercase">
               Resulting Tier
             </p>
-            <div className="mt-2 flex items-baseline gap-2">
-              <p className="font-display text-3xl font-extrabold">{newLabel}</p>
+            <div className="mt-2 flex items-center gap-2 flex-wrap">
+              <p className="font-display text-2xl font-extrabold text-[var(--color-ink)]">
+                {newLabel}
+              </p>
               <span
-                className={`px-2 py-0.5 rounded-full text-[0.65rem] font-bold border ${
-                  TIER_BADGES[newTier] || TIER_BADGES[1]
-                }`}
+                className={`px-2 py-0.5 rounded-md text-[0.64rem] font-bold border tier-badge-${newTier}`}
               >
-                Tier {newTier}
+                T{newTier}
               </span>
             </div>
-            <p className="accent-label mt-1.5 text-xs">
-              was {baseLabel} (Tier {baseTier}) ·{' '}
-              {tierStepDelta === 0
-                ? 'No tier step change'
-                : `${tierStepDelta > 0 ? `+${tierStepDelta}` : tierStepDelta} tier step`}
+            <p className="mt-1.5 text-[0.7rem] text-[var(--color-ink-soft)]">
+              was {baseLabel} ·{' '}
+              <span className={tierStepDelta > 0 ? 'text-pos font-semibold' : tierStepDelta < 0 ? 'text-warn font-semibold' : ''}>
+                {tierStepDelta === 0
+                  ? 'No shift'
+                  : `${tierStepDelta > 0 ? `+${tierStepDelta}` : tierStepDelta} tier`}
+              </span>
             </p>
           </div>
 
           <div className="metric-tile">
-            <p className="text-[0.7rem] tracking-wide text-[var(--color-ink-soft)] uppercase">
-              P(class={newTier} · {newLabel})
+            <p className="text-[0.66rem] font-semibold tracking-wider text-[var(--color-ink-muted)] uppercase">
+              P(Tier {newTier})
             </p>
-            <p className="font-display mt-2 text-3xl font-extrabold">
+            <p className="font-mono tabular-nums mt-2 text-2xl font-bold text-[var(--color-ink)]">
               {(activeTierProb * 100).toFixed(1)}%
             </p>
-            <p className="accent-label mt-1.5 text-xs">
-              Δ {formatSigned(activeTierShift * 100, 1)}% pts vs baseline
+            <p
+              className={`mt-1.5 text-[0.7rem] font-mono tabular-nums font-medium ${
+                activeTierShift > 0.005
+                  ? 'text-pos'
+                  : activeTierShift < -0.005
+                  ? 'text-neg'
+                  : 'text-[var(--color-ink-soft)]'
+              }`}
+            >
+              Δ {formatSigned(activeTierShift * 100, 1)}% pts
             </p>
           </div>
 
           <div className="metric-tile">
-            <div className="flex items-center justify-between">
-              <p className="text-[0.7rem] tracking-wide text-[var(--color-ink-soft)] uppercase">
-                Illustrative Margin Δ
+            <div className="flex items-center justify-between gap-1">
+              <p className="text-[0.66rem] font-semibold tracking-wider text-[var(--color-ink-muted)] uppercase">
+                Margin Δ
               </p>
-              <span className="text-[0.62rem] font-semibold uppercase px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-600">
-                Illustrative
+              <span className="text-[0.58rem] font-semibold uppercase px-1.5 py-0.5 rounded bg-[var(--color-warn-bg)] text-warn">
+                Proxy
               </span>
             </div>
             <p
-              className={`font-display mt-2 text-3xl font-extrabold ${
+              className={`font-mono tabular-nums mt-2 text-2xl font-bold ${
                 marginDelta > 0
-                  ? 'text-emerald-600'
+                  ? 'text-pos'
                   : marginDelta < 0
-                  ? 'text-rose-600'
-                  : ''
+                  ? 'text-neg'
+                  : 'text-[var(--color-ink)]'
               }`}
             >
               {formatSigned(marginDelta, 2, '$')}
             </p>
-            <p className="mt-1.5 text-xs" style={{ color: 'var(--color-warn)' }}>
-              {formatSigned(marginPctDelta, 2)}% pts · Non-vendor cost proxy
+            <p className="mt-1.5 text-[0.7rem] font-mono tabular-nums text-[var(--color-ink-soft)]">
+              {formatSigned(marginPctDelta, 2)}% pts
             </p>
           </div>
         </div>
 
         {/* Per-class Probability Shift Breakdown */}
-        <div className="mt-5 rounded-xl border border-[var(--color-line)] bg-[var(--color-field-bg)]/60 p-4">
+        <div className="mt-4 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface-subtle)] p-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink)]">
-              Class Probability Distribution &amp; Shifts
+            <h3 className="text-[0.7rem] font-bold uppercase tracking-wider text-[var(--color-ink)]">
+              Class Probability Shifts
             </h3>
-            <span className="text-[0.68rem] text-[var(--color-ink-soft)]">
+            <span className="text-[0.66rem] text-[var(--color-ink-muted)]">
               Baseline → Simulated (Δ)
             </span>
           </div>
@@ -169,32 +171,41 @@ export default function MarginImpactPanel({
               return (
                 <div key={tName} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
-                    <span className={`font-medium ${isPredicted ? 'font-bold text-[var(--color-ink)]' : 'text-[var(--color-ink-soft)]'}`}>
+                    <span
+                      className={
+                        isPredicted
+                          ? 'font-semibold text-[var(--color-ink)]'
+                          : 'text-[var(--color-ink-soft)]'
+                      }
+                    >
                       Tier {idx}: {tName} {isPredicted && '★'}
                     </span>
-                    <span className="font-mono text-[0.72rem]">
-                      <span className="text-[var(--color-ink-soft)]">{baseP.toFixed(1)}%</span>
+                    <span className="font-mono tabular-nums text-[0.72rem]">
+                      <span className="text-[var(--color-ink-muted)]">{baseP.toFixed(1)}%</span>
                       {' → '}
                       <strong className="text-[var(--color-ink)]">{newP.toFixed(1)}%</strong>{' '}
                       <span
                         className={
                           shiftP > 0.05
-                            ? 'text-emerald-600 font-semibold'
+                            ? 'text-pos font-semibold'
                             : shiftP < -0.05
-                            ? 'text-rose-600 font-semibold'
-                            : 'text-[var(--color-ink-soft)]'
+                            ? 'text-neg font-semibold'
+                            : 'text-[var(--color-ink-muted)]'
                         }
                       >
                         ({formatSigned(shiftP, 1)}%)
                       </span>
                     </span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-[var(--color-line)] overflow-hidden">
+                  <div className="h-2 w-full rounded-full bar-track overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-300 ${
-                        isPredicted ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-ink-soft)]/50'
-                      }`}
-                      style={{ width: `${Math.max(2, Math.min(100, newP))}%` }}
+                      className="h-full rounded-full transition-all duration-300"
+                      style={{
+                        width: `${Math.max(1.5, Math.min(100, newP))}%`,
+                        backgroundColor: isPredicted
+                          ? 'var(--color-accent)'
+                          : 'color-mix(in srgb, var(--color-ink) 22%, transparent)',
+                      }}
                     />
                   </div>
                 </div>
@@ -205,35 +216,39 @@ export default function MarginImpactPanel({
 
         {/* Illustrative BOM Cost & Tier Midpoint Breakdown */}
         {whatIfResult && (
-          <div className="mt-4 rounded-xl border border-[var(--color-line)] bg-[var(--color-field-bg)]/40 p-4 text-xs space-y-2">
-            <div className="flex items-center justify-between font-bold text-[var(--color-ink)]">
-              <span>Illustrative Economic Breakdown (Synthetic Linear Proxy)</span>
-              <span className="text-[0.65rem] uppercase tracking-wider text-amber-600">
+          <div className="mt-4 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface-subtle)] p-4 text-xs space-y-2.5">
+            <div className="flex items-center justify-between font-semibold text-[var(--color-ink)]">
+              <span>Illustrative Economic Breakdown</span>
+              <span className="text-[0.62rem] uppercase tracking-wider font-mono text-warn">
                 Linear Proxy
               </span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
-              <div className="p-2 rounded-lg bg-[var(--color-bg)] border border-[var(--color-line)]">
-                <div className="text-[0.65rem] text-[var(--color-ink-soft)]">Tier Midpoint</div>
-                <div className="font-mono font-bold mt-0.5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="p-2.5 rounded-lg bg-[var(--color-panel)] border border-[var(--color-line)]">
+                <div className="text-[0.64rem] text-[var(--color-ink-muted)]">Tier Midpoint</div>
+                <div className="font-mono tabular-nums font-bold mt-0.5 text-[var(--color-ink)]">
                   ${baseMidpoint?.toFixed(0)} → ${newMidpoint?.toFixed(0)}
                 </div>
               </div>
-              <div className="p-2 rounded-lg bg-[var(--color-bg)] border border-[var(--color-line)]">
-                <div className="text-[0.65rem] text-[var(--color-ink-soft)]">Est. BOM Proxy</div>
-                <div className="font-mono font-bold mt-0.5">
-                  ${baseBom?.toFixed(2)} → ${adjustedBom?.toFixed(2)}
+              <div className="p-2.5 rounded-lg bg-[var(--color-panel)] border border-[var(--color-line)]">
+                <div className="text-[0.64rem] text-[var(--color-ink-muted)]">Est. BOM Proxy</div>
+                <div className="font-mono tabular-nums font-bold mt-0.5 text-[var(--color-ink)]">
+                  ${baseBom?.toFixed(0)} → ${adjustedBom?.toFixed(0)}
                 </div>
               </div>
-              <div className="p-2 rounded-lg bg-[var(--color-bg)] border border-[var(--color-line)]">
-                <div className="text-[0.65rem] text-[var(--color-ink-soft)]">BOM Cost Δ</div>
-                <div className="font-mono font-bold mt-0.5">
+              <div className="p-2.5 rounded-lg bg-[var(--color-panel)] border border-[var(--color-line)]">
+                <div className="text-[0.64rem] text-[var(--color-ink-muted)]">BOM Cost Δ</div>
+                <div
+                  className={`font-mono tabular-nums font-bold mt-0.5 ${
+                    bomDelta > 0 ? 'text-neg' : bomDelta < 0 ? 'text-pos' : 'text-[var(--color-ink)]'
+                  }`}
+                >
                   {formatSigned(bomDelta, 2, '$')}
                 </div>
               </div>
-              <div className="p-2 rounded-lg bg-[var(--color-bg)] border border-[var(--color-line)]">
-                <div className="text-[0.65rem] text-[var(--color-ink-soft)]">Est. Gross Margin</div>
-                <div className="font-mono font-bold mt-0.5">
+              <div className="p-2.5 rounded-lg bg-[var(--color-panel)] border border-[var(--color-line)]">
+                <div className="text-[0.64rem] text-[var(--color-ink-muted)]">Gross Margin</div>
+                <div className="font-mono tabular-nums font-bold mt-0.5 text-[var(--color-ink)]">
                   ${marginEstimate?.toFixed(2)}
                 </div>
               </div>
@@ -241,28 +256,28 @@ export default function MarginImpactPanel({
           </div>
         )}
 
-        {/* Server-flagged Extrapolation Warning (PRD Ch. 15.3) */}
+        {/* Server-flagged Extrapolation Warning */}
         {whatIfResult?.is_extrapolated && (
           <div
             role="status"
-            className="mt-4 rounded-xl border border-amber-500/60 bg-amber-500/10 p-3 text-xs text-amber-700 dark:text-amber-300"
+            className="mt-4 rounded-xl border border-[var(--color-warn-border)] bg-[var(--color-warn-bg)] p-3 text-xs text-warn"
           >
-            <strong>Backend Extrapolation Flag Active:</strong> Adjusted feature(s){' '}
+            <strong>Backend OOD Flag Active:</strong> Adjusted feature(s){' '}
             <code className="font-mono font-bold">
               {whatIfResult.extrapolated_features.join(', ')}
             </code>{' '}
-            exceed the Kaggle training domain. Random Forest probability estimates plateau outside observed split thresholds.
+            exceed the training domain. Probabilities plateau outside observed leaf thresholds.
           </div>
         )}
       </div>
 
-      {/* Mandatory Always-Visible Caveat Banner (PRD Ch. 5.3 / 13) */}
+      {/* Mandatory Always-Visible Caveat Banner */}
       <div
         data-testid="illustrative-cost-caveat"
-        className="caveat mt-5 rounded-xl border border-amber-500/40 bg-amber-500/10 p-3.5 text-xs leading-relaxed"
+        className="caveat mt-5 leading-relaxed"
       >
-        <strong className="uppercase tracking-wider text-[0.68rem] block mb-0.5">
-          ⚠️ Illustrative Cost Model Caveat
+        <strong className="uppercase tracking-wider text-[0.66rem] block mb-0.5">
+          Illustrative Cost Model Caveat
         </strong>
         {whatIfResult?.caveat ||
           'Illustrative cost model — not real vendor BOM data. Margin figures combine predicted tier price midpoints ($125 / $225 / $400 / $650) with a transparent linear hardware cost approximation for directional trade-off exploration only.'}

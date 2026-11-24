@@ -1,19 +1,29 @@
 import FeatureImportanceChart from '../components/FeatureImportanceChart'
 
+const SELECTED_DRIVERS = [
+  { name: 'RAM', desc: 'Governs multi-tasking headroom and primary tier discrimination.' },
+  { name: 'Battery Power', desc: 'Major discriminator between budget and premium tiers.' },
+  { name: 'Pixel Width', desc: 'Horizontal display resolution driver.' },
+  { name: 'Pixel Height', desc: 'Vertical display resolution and panel density driver.' },
+  { name: 'Mobile Weight', desc: 'Chassis build material and battery density indicator.' },
+]
+
 export default function FeaturesPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="border-b border-[var(--color-line)] pb-4">
+      <div className="border-b border-[var(--color-line)] pb-5">
         <div className="flex items-center gap-2">
-          <span className="accent-label text-xs font-semibold tracking-wider uppercase">Module 02</span>
-          <span className="phase-chip text-[0.65rem]">Global Explainability</span>
+          <span className="accent-label text-[0.7rem] font-semibold tracking-wider uppercase">
+            Global Explainability
+          </span>
+          <span className="phase-chip text-[0.62rem]">RFECV Audit</span>
         </div>
         <h1 className="font-display text-3xl font-extrabold mt-1 text-[var(--color-ink)]">
           Global Feature Importance
         </h1>
-        <p className="text-sm text-[var(--color-ink-soft)] mt-0.5">
-          Recursive Feature Elimination with Cross-Validation (RFECV) identified the 5 essential hardware drivers governing handset pricing.
+        <p className="text-sm text-[var(--color-ink-soft)] mt-1">
+          Recursive Feature Elimination with Cross-Validation (RFECV) isolated the 5 core hardware drivers governing handset pricing.
         </p>
       </div>
 
@@ -22,40 +32,39 @@ export default function FeaturesPage() {
           <FeatureImportanceChart />
         </div>
 
-        {/* Feature selection table & notes */}
-        <div className="lg:col-span-4 space-y-4">
-          <div className="panel p-5 rounded-2xl border border-[var(--color-line)] space-y-3">
+        {/* Feature selection notes */}
+        <div className="lg:col-span-4 space-y-5">
+          <div className="panel p-5 rounded-2xl space-y-3.5">
             <h3 className="font-display text-base font-bold text-[var(--color-ink)]">
-              Primary Selected Drivers
+              Retained Hardware Drivers (5)
             </h3>
             <p className="text-xs text-[var(--color-ink-soft)] leading-relaxed">
-              These 5 features govern &gt;96% of the price variance across all four tiers:
+              These 5 features carry 100% of active split weight in the production ensemble:
             </p>
-            <ol className="space-y-2 text-xs list-decimal list-inside font-medium text-[var(--color-ink)]">
-              <li className="p-2 rounded-lg bg-[var(--color-field-bg)] border border-[var(--color-line)]">
-                <span className="font-bold text-[var(--color-accent)]">RAM</span> — Governs multi-tasking headroom and primary tier discrimination.
-              </li>
-              <li className="p-2 rounded-lg bg-[var(--color-field-bg)] border border-[var(--color-line)]">
-                <span className="font-bold text-[var(--color-accent)]">Battery Power</span> — Major discriminator between budget and premium tiers.
-              </li>
-              <li className="p-2 rounded-lg bg-[var(--color-field-bg)] border border-[var(--color-line)]">
-                <span className="font-bold text-[var(--color-accent)]">Pixel Width</span> — Display resolution driver.
-              </li>
-              <li className="p-2 rounded-lg bg-[var(--color-field-bg)] border border-[var(--color-line)]">
-                <span className="font-bold text-[var(--color-accent)]">Pixel Height</span> — Display quality and density driver.
-              </li>
-              <li className="p-2 rounded-lg bg-[var(--color-field-bg)] border border-[var(--color-line)]">
-                <span className="font-bold text-[var(--color-accent)]">Mobile Weight</span> — Physical chassis build and battery density factor.
-              </li>
+            <ol className="space-y-2 text-xs">
+              {SELECTED_DRIVERS.map((driver, idx) => (
+                <li
+                  key={driver.name}
+                  className="p-2.5 rounded-xl bg-[var(--color-surface-subtle)] border border-[var(--color-line)] flex items-start gap-2.5"
+                >
+                  <span className="font-mono text-[0.68rem] font-bold text-[var(--color-accent-text)] mt-0.5">
+                    0{idx + 1}
+                  </span>
+                  <div>
+                    <span className="font-semibold text-[var(--color-ink)]">{driver.name}</span>
+                    <span className="text-[var(--color-ink-soft)]"> — {driver.desc}</span>
+                  </div>
+                </li>
+              ))}
             </ol>
           </div>
 
-          <div className="panel p-5 rounded-2xl border border-[var(--color-line)] space-y-2">
+          <div className="panel p-5 rounded-2xl space-y-2">
             <h3 className="font-display text-sm font-bold text-[var(--color-ink)]">
-              Eliminated Noise Attributes (15)
+              Eliminated Attributes (15)
             </h3>
             <p className="text-xs text-[var(--color-ink-soft)] leading-relaxed">
-              Attributes like <code>wifi</code>, <code>bluetooth</code>, <code>talk_time</code>, and <code>four_g</code> were eliminated by RFECV because they exhibit near-universal saturation across all tiers.
+              Attributes like <code className="font-mono">wifi</code>, <code className="font-mono">blue</code>, <code className="font-mono">talk_time</code>, and <code className="font-mono">four_g</code> were pruned by RFECV because they exhibit near-universal saturation across all four tiers and add split variance without accuracy gain.
             </p>
           </div>
         </div>

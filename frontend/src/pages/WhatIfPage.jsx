@@ -148,25 +148,25 @@ export default function WhatIfPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[var(--color-line)] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 border-b border-[var(--color-line)] pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="accent-label text-xs font-semibold tracking-wider uppercase">
-              Module 04 &amp; 05
+            <span className="accent-label text-[0.7rem] font-semibold tracking-wider uppercase">
+              Simulation Workspace
             </span>
-            <span className="phase-chip text-[0.65rem]">
+            <span className="phase-chip text-[0.62rem]">
               {initializing
                 ? 'Seeding Baseline...'
                 : baselinePrediction
-                ? `Baseline Prediction #${baselinePrediction.prediction_id}`
+                ? `Baseline #${baselinePrediction.prediction_id}`
                 : 'Interactive Simulation'}
             </span>
           </div>
           <h1 className="font-display text-3xl font-extrabold mt-1 text-[var(--color-ink)]">
             What-If &amp; Margin Sandbox
           </h1>
-          <p className="text-sm text-[var(--color-ink-soft)] mt-0.5">
-            Simulate real-time hardware specification modifications to observe price-tier transitions and illustrative bill-of-materials (BOM) margin impact.
+          <p className="text-sm text-[var(--color-ink-soft)] mt-1">
+            Simulate real-time hardware modifications to observe price-tier transitions and illustrative bill-of-materials (BOM) margin impact.
           </p>
         </div>
       </div>

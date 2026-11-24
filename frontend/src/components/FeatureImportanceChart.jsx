@@ -71,45 +71,59 @@ export default function FeatureImportanceChart() {
 
   return (
     <section className="panel h-full rounded-2xl p-5 md:p-6" id="importance-panel">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-3 pb-4 border-b border-[var(--color-line)]">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="accent-label text-[0.7rem] font-semibold tracking-[0.14em] uppercase">
-              Module 02
-            </span>
-            <span className="phase-chip text-[0.65rem]">
-              {modelVersion || 'Active Model'}
-            </span>
-          </div>
-          <h2 className="font-display mt-1 text-xl font-bold">
-            Global Feature Importance
+          <h2 className="font-display text-lg font-bold text-[var(--color-ink)]">
+            RFECV Gini Importance Ranking
           </h2>
-          <p className="mt-1 text-sm text-[var(--color-ink-soft)]">
-            Mean decrease in impurity from Random Forest with RFECV selection.
+          <p className="mt-0.5 text-xs text-[var(--color-ink-soft)]">
+            Normalized mean decrease in impurity across the production Random Forest ensemble.
           </p>
         </div>
+        <span className="phase-chip text-[0.64rem]">
+          {modelVersion || 'Active Model'}
+        </span>
       </div>
 
       {/* Filter and stats banner */}
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-line)] pb-3">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[var(--color-line)]">
         <div className="flex items-center gap-2 text-xs">
-          <span className="font-semibold text-[var(--color-ink)]">
-            Selected: <span className="text-[var(--color-accent)]">{nSelected}</span> / {data.length}
+          <span className="text-[var(--color-ink-soft)]">Retained by RFECV:</span>
+          <span className="font-mono font-bold text-[var(--color-accent-text)] tabular-nums">
+            {nSelected} / {data.length}
           </span>
-          <span className="text-[var(--color-ink-soft)]">features</span>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowOnlySelected(!showOnlySelected)}
-          className="text-xs px-2.5 py-1 rounded-md border border-[var(--color-line)] text-[var(--color-ink-soft)] hover:text-[var(--color-ink)] hover:border-[var(--color-accent)] transition-all cursor-pointer"
-        >
-          {showOnlySelected ? 'Show All 20 Features' : 'Show Only Selected (Top 5)'}
-        </button>
+
+        {/* Segmented toggle */}
+        <div className="inline-flex rounded-lg border border-[var(--color-line-strong)] bg-[var(--color-surface-subtle)] p-0.5 text-xs">
+          <button
+            type="button"
+            onClick={() => setShowOnlySelected(true)}
+            className={`px-2.5 py-1 rounded-md font-medium transition-colors cursor-pointer ${
+              showOnlySelected
+                ? 'bg-[var(--color-panel)] text-[var(--color-ink)] shadow-xs'
+                : 'text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]'
+            }`}
+          >
+            Top 5 Selected
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowOnlySelected(false)}
+            className={`px-2.5 py-1 rounded-md font-medium transition-colors cursor-pointer ${
+              !showOnlySelected
+                ? 'bg-[var(--color-panel)] text-[var(--color-ink)] shadow-xs'
+                : 'text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]'
+            }`}
+          >
+            All 20 Specs
+          </button>
+        </div>
       </div>
 
       {/* Loading state */}
       {loading && (
-        <div className="mt-8 flex flex-col items-center justify-center py-12 text-sm text-[var(--color-ink-soft)]">
+        <div className="mt-8 flex flex-col items-center justify-center py-12 text-xs text-[var(--color-ink-soft)]">
           <div className="skeleton-bar w-36 h-2 mb-3" />
           <span>Loading live feature importance from <code>/feature-importance</code>...</span>
         </div>
@@ -117,13 +131,13 @@ export default function FeatureImportanceChart() {
 
       {/* Error state */}
       {error && !loading && (
-        <div className="mt-6 rounded-lg border border-[var(--color-warn)] bg-[var(--color-caveat-bg)] p-4 text-xs text-[var(--color-caveat-text)]">
+        <div className="mt-6 rounded-xl border border-[var(--color-neg-border)] bg-[var(--color-neg-bg)] p-4 text-xs text-neg">
           <p className="font-semibold">Unable to fetch importance scores</p>
           <p className="mt-1">{error}</p>
           <button
             type="button"
             onClick={handleRetry}
-            className="mt-3 px-3 py-1 bg-[var(--color-ink)] text-[var(--color-cta-fg)] rounded text-xs cursor-pointer"
+            className="mt-3 cta-primary text-xs py-1.5 px-3 cursor-pointer"
           >
             Retry
           </button>
@@ -132,50 +146,54 @@ export default function FeatureImportanceChart() {
 
       {/* Chart display */}
       {!loading && !error && chartData.length > 0 && (
-        <div className="mt-6">
-          <div className="h-64 w-full">
+        <div className="mt-5">
+          <div className={showOnlySelected ? 'h-64 w-full' : 'h-[28rem] w-full'}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={chartData}
                 layout="vertical"
-                margin={{ top: 5, right: 25, left: 25, bottom: 5 }}
+                margin={{ top: 5, right: 24, left: 20, bottom: 5 }}
               >
                 <XAxis
                   type="number"
                   domain={[0, 'dataMax + 5']}
                   unit="%"
-                  tick={{ fontSize: 11, fill: 'var(--color-ink-soft)' }}
+                  tick={{ fontSize: 11, fill: 'var(--color-ink-soft)', fontFamily: 'var(--font-mono)' }}
                   axisLine={{ stroke: 'var(--color-line)' }}
+                  tickLine={false}
                 />
                 <YAxis
                   type="category"
                   dataKey="name"
-                  tick={{ fontSize: 12, fill: 'var(--color-ink)', fontWeight: 500 }}
+                  tick={{ fontSize: 12, fill: 'var(--color-ink)', fontWeight: 500, fontFamily: 'var(--font-mono)' }}
                   axisLine={{ stroke: 'var(--color-line)' }}
-                  width={90}
+                  tickLine={false}
+                  width={100}
                 />
                 <Tooltip
+                  cursor={{ fill: 'var(--color-accent-soft)' }}
                   formatter={(val, _name, item) => [
-                    `${val}% (Impurity reduction: ${item.payload.rawImportance.toFixed(4)})`,
-                    'Importance',
+                    `${val}% (Gini: ${item.payload.rawImportance.toFixed(4)})`,
+                    'Weight',
                   ]}
                   labelFormatter={(name) => `Feature: ${name}`}
                   contentStyle={{
-                    backgroundColor: 'var(--color-panel-solid)',
-                    borderColor: 'var(--color-line)',
-                    borderRadius: '0.5rem',
-                    fontSize: '0.8rem',
+                    backgroundColor: 'var(--color-panel)',
+                    borderColor: 'var(--color-line-strong)',
+                    borderRadius: '0.625rem',
+                    fontSize: '0.78rem',
                     color: 'var(--color-ink)',
+                    boxShadow: 'var(--panel-shadow)',
                   }}
                 />
-                <Bar dataKey="importancePercent" radius={[0, 4, 4, 0]}>
+                <Bar dataKey="importancePercent" radius={[0, 5, 5, 0]}>
                   {chartData.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={
                         entry.selected
                           ? 'var(--color-accent)'
-                          : 'color-mix(in srgb, var(--color-ink) 20%, transparent)'
+                          : 'color-mix(in srgb, var(--color-ink) 18%, transparent)'
                       }
                     />
                   ))}
@@ -184,18 +202,18 @@ export default function FeatureImportanceChart() {
             </ResponsiveContainer>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-[0.7rem] text-[var(--color-ink-soft)] border-t border-[var(--color-line)] pt-3">
-            <div className="flex items-center gap-3">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-[0.7rem] text-[var(--color-ink-muted)] border-t border-[var(--color-line)] pt-3">
+            <div className="flex items-center gap-4">
               <span className="flex items-center gap-1.5">
-                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[var(--color-accent)]" />
+                <span className="inline-block h-2.5 w-2.5 rounded-xs bg-[var(--color-accent)]" />
                 <span>RFECV Selected (Rank 1)</span>
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[var(--color-line)] opacity-70" />
+                <span className="inline-block h-2.5 w-2.5 rounded-xs bg-[var(--color-line-strong)]" />
                 <span>Eliminated</span>
               </span>
             </div>
-            <span>Live data from <code>GET /feature-importance</code></span>
+            <span className="font-mono">GET /feature-importance</span>
           </div>
         </div>
       )}
