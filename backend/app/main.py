@@ -5,6 +5,7 @@ Registers routers and loads the model artifact at startup when available.
 """
 
 from contextlib import asynccontextmanager
+import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -34,10 +35,17 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+_raw_origins = os.getenv("CORS_ORIGINS", "*").strip()
+_cors_origins = (
+    ["*"]
+    if _raw_origins == "*"
+    else [o.strip() for o in _raw_origins.split(",") if o.strip()]
+)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=_cors_origins,
+    allow_credentials=_cors_origins != ["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )

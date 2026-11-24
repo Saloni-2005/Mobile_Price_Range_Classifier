@@ -22,7 +22,13 @@ DEFAULT_SQLITE_PATH = (
 )
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-if not DATABASE_URL:
+if DATABASE_URL:
+    # Render / Heroku managed PostgreSQL may emit postgres:// or postgresql://
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg2://", 1)
+    elif DATABASE_URL.startswith("postgresql://"):
+        DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
+else:
     pg_url = "postgresql+psycopg2://postgres:postgres@localhost:5432/mobile_price"
     try:
         test_engine = create_engine(pg_url, pool_pre_ping=True)

@@ -1,0 +1,26 @@
+databases:
+  - name: tierlab-db
+    databaseName: mobile_price
+    user: tierlab
+    plan: free
+
+services:
+  - type: web
+    name: tierlab-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tierlab-db
+          property: connectionString
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: ANALYST_USERNAME
+        value: analyst
+      - key: ANALYST_PASSWORD
+        value: pricing2026
