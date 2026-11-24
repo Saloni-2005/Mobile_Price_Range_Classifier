@@ -13,13 +13,19 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import auth, explain, health, importance, predict, whatif
 from app.auth.jwt_handler import seed_analyst_user
-from app.services.inference import clear_model_cache, is_model_loadable, load_model
+from app.services.inference import (
+    clear_model_cache,
+    is_model_loadable,
+    load_model,
+    seed_model_registry,
+)
 from app.services.shap_service import clear_explainer_cache
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     seed_analyst_user()
+    seed_model_registry()
     clear_model_cache()
     clear_explainer_cache()
     if is_model_loadable():

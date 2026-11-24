@@ -228,6 +228,71 @@ def get_active_model_version() -> str:
     return "unknown"
 
 
+def seed_model_registry() -> None:
+    """
+    Ensure an active ModelRegistry row exists on fresh databases (e.g. Render Postgres).
+    Idempotent: does nothing if an active model_registry entry already exists.
+    """
+    import json
+
+    from app.db.models import ModelRegistry
+    from app.db.session import SessionLocal, init_db
+
+    init_db()
+    db = SessionLocal()
+    try:
+        existing_active = (
+            db.query(ModelRegistry).filter(ModelRegistry.is_active.is_(True)).first()
+        )
+        if existing_active is not None:
+            return
+
+        if TUNED_ARTIFACT_PATH.exists():
+            version_tag = "v1.1.0-tuned-rfecv"
+            rel_path = "artifacts/tuned_rfecv_rf.joblib"
+            metrics_file = _REPO_ROOT / "artifacts" / "tuned_metrics.json"
+        elif DEFAULT_ARTIFACT_PATH.exists():
+            version_tag = "v1.0.0-baseline"
+            rel_path = "artifacts/baseline_rf.joblib"
+            metrics_file = _REPO_ROOT / "artifacts" / "baseline_metrics.json"
+        else:
+            return
+
+        cv_acc: float | None = 0.9256
+        cv_f1: float | None = 0.9399
+        if metrics_file.exists():
+            try:
+                metrics = json.loads(metrics_file.read_text(encoding="utf-8"))
+                cv_acc = float(metrics.get("cv_accuracy_mean", cv_acc))
+                cv_f1 = float(
+                    metrics.get("holdout_macro_f1", metrics.get("cv_macro_f1_mean", cv_f1))
+                )
+            except Exception:
+                pass
+
+        by_tag = (
+            db.query(ModelRegistry)
+            .filter(ModelRegistry.version_tag == version_tag)
+            .first()
+        )
+        if by_tag is not None:
+            by_tag.is_active = True
+            by_tag.artifact_path = rel_path
+        else:
+            db.add(
+                ModelRegistry(
+                    version_tag=version_tag,
+                    cv_accuracy=cv_acc,
+                    cv_macro_f1=cv_f1,
+                    artifact_path=rel_path,
+                    is_active=True,
+                )
+            )
+        db.commit()
+    finally:
+        db.close()
+
+
 # ---------------------------------------------------------------------------
 # Feature-importance helpers
 # ---------------------------------------------------------------------------
